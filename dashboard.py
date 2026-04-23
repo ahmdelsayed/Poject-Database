@@ -1,4 +1,4 @@
-from tkinter import * #omar 5awel
+from tkinter import * 
 from PIL import Image, ImageTk 
 from employee import employeeClass
 import pyodbc
