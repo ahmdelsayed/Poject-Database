@@ -1,4 +1,4 @@
-from tkinter import * #test
+from tkinter import * 
 from PIL import Image, ImageTk 
 from employee import employeeClass
 import pyodbc
