@@ -4,6 +4,7 @@ from employee import employeeClass
 import pyodbc
 from supplier import supplierClass
 from category import categoryClass
+from product import productClass
 
 
 class IMS:
@@ -132,8 +133,8 @@ class IMS:
         menus = {
             "Employee": self.employee,
             "Supplier": self.supplier,
-            "Category": self.category, # تقدر تضيف الدوال بتاعتهم هنا لما تجهز
-            "Products": None,
+            "Category": self.category, 
+            "Products": self.product,
             "Sales": None,
             "Exit": self.root.quit
         }
@@ -171,7 +172,7 @@ class IMS:
         self.lbl_category = Button(self.Main_Frame, text="Total Category\n[ 0 ]", command=self.category, bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
         self.lbl_category.grid(row=0, column=2, padx=15, pady=15, sticky="nsew")
 
-        self.lbl_product = Button(self.Main_Frame, text="Total Product\n[ 0 ]", bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
+        self.lbl_product = Button(self.Main_Frame, text="Total Product\n[ 0 ]", command=self.product, bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
         self.lbl_product.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
 
         self.lbl_sales = Button(self.Main_Frame, text="Total Sales\n[ 0 ]", bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
@@ -225,7 +226,13 @@ class IMS:
 
     def category(self):
         self.new_win = Toplevel(self.root)
-        self.new_obj = categoryClass(self.new_win)       
+        self.new_obj = categoryClass(self.new_win)    
+
+    def product(self):
+        self.new_win = Toplevel(self.root)
+        self.new_obj = productClass(self.new_win)       
+
+
 
 if __name__ == "__main__":
     root = Tk()
