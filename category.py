@@ -19,6 +19,7 @@ class categoryClass:
         Header_Frame = Frame(self.root, bg="#0f172a", bd=0)
         Header_Frame.pack(side=TOP, fill=X)
         
+    
         title = Label(Header_Frame, text="📑 PRODUCT CATEGORY MANAGEMENT", font=("Segoe UI", 18, "bold"), bg="#0f172a", fg="white", pady=15)
         title.pack()
 

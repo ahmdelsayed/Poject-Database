@@ -151,7 +151,7 @@ class IMS:
                 activeforeground="white",
                 cursor="hand2",
                 pady=10,
-                command=m_command # هنا الربط بالدالة
+                command=m_command
             )
             btn.pack(side=TOP, fill=X)
             self.menu_btns.append(btn)
@@ -183,7 +183,7 @@ class IMS:
         # == Footer ==
         self.lbl_footer = Label(
             self.root,
-            text="IMS-Inventory Management System | Developed By\n Ahmed Elsayed & Gamal Esam & Shanouda Romany",
+            text="IMS-Inventory Management System | Developed By\n Ahmed Elsayed & Gamal Esam & Shanouda Romany & Youssef Songor ",
             font=("Segoe UI", 10),
             bg=self.primary_color,
             fg="white"

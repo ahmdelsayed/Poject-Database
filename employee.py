@@ -7,12 +7,12 @@ from tkcalendar import DateEntry
 class employeeClass:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1100x600+220+130") # زدنا الارتفاع قليلاً لراحة العين
+        self.root.geometry("1100x650+220+50")
         self.root.title("Inventory Management System | Employee Management")
         self.root.config(bg="#f4f6f7")
         self.root.focus_force()
 
-        #================ Variables (No Change) =================
+        #================ Variables =================
         self.var_searchby = StringVar()
         self.var_searchtxt = StringVar()
         self.var_emp_id = StringVar()
@@ -26,9 +26,12 @@ class employeeClass:
         self.var_utype = StringVar()
         self.var_salary = StringVar()
 
-        #--- Title Section ---
-        title = Label(self.root, text="EMPLOYEE MANAGEMENT SYSTEM", font=("Segoe UI", 20, "bold"), bg="#2c3e50", fg="white", bd=5, relief=RIDGE)
-        title.pack(side=TOP, fill=X, padx=10, pady=10)
+        #--- Header Section ---
+        Header_Frame = Frame(self.root, bg="#0f172a", bd=0)
+        Header_Frame.pack(side=TOP, fill=X)
+        
+        title = Label(Header_Frame, text="👥 EMPLOYEE MANAGEMENT SYSTEM", font=("Segoe UI", 18, "bold"), bg="#0f172a", fg="white", pady=15)
+        title.pack()
 
         #--- Main Container Frame ---
         Main_Frame = Frame(self.root, bg="#f4f6f7")
@@ -39,16 +42,16 @@ class employeeClass:
         SearchFrame.place(x=0, y=0, width=1060, height=80)
 
         cmb_search = ttk.Combobox(SearchFrame, textvariable=self.var_searchby, values=("Select", "Email", "Name", "Contact"), state='readonly', justify=CENTER, font=("Segoe UI", 12))
-        cmb_search.place(x=10, y=10, width=200, height=30)
+        cmb_search.place(x=10, y=10, width=180, height=30)
         cmb_search.current(0)
 
-        txt_search = Entry(SearchFrame, textvariable=self.var_searchtxt, font=("Segoe UI", 12), bg="#ebf5fb", bd=1).place(x=220, y=10, width=400, height=30)
-        btn_search = Button(SearchFrame, text="Search Now", command=self.search, font=("Segoe UI", 11, "bold"), bg="#3498db", fg="white", cursor="hand2", bd=0).place(x=630, y=10, width=150, height=30)
-        btn_all = Button(SearchFrame, text="Show All", command=self.show, font=("Segoe UI", 11, "bold"), bg="#607d8b", fg="white", cursor="hand2", bd=0).place(x=790, y=10, width=150, height=30)
+        txt_search = Entry(SearchFrame, textvariable=self.var_searchtxt, font=("Segoe UI", 12), bg="#ebf5fb", bd=1).place(x=200, y=10, width=400, height=30)
+        btn_search = Button(SearchFrame, text="Search Now", command=self.search, font=("Segoe UI", 11, "bold"), bg="#3498db", fg="white", cursor="hand2", bd=0).place(x=610, y=10, width=140, height=30)
+        btn_all = Button(SearchFrame, text="Show All", command=self.show, font=("Segoe UI", 11, "bold"), bg="#607d8b", fg="white", cursor="hand2", bd=0).place(x=760, y=10, width=140, height=30)
 
         #--- Content Frame (Input Fields) ---
         InputFrame = Frame(Main_Frame, bg="white", bd=2, relief=RIDGE)
-        InputFrame.place(x=0, y=90, width=1060, height=300)
+        InputFrame.place(x=0, y=90, width=1060, height=310)
 
         #--- Row 1 ---
         Label(InputFrame, text="Emp ID", font=("Segoe UI", 11), bg="white").place(x=30, y=20)
@@ -96,21 +99,20 @@ class employeeClass:
 
         #--- Buttons Frame ---
         btn_Frame = Frame(InputFrame, bg="white")
-        btn_Frame.place(x=480, y=240, width=540, height=45)
+        btn_Frame.place(x=330, y=235, width=650, height=50) 
 
-        btn_add = Button(btn_Frame, text="Save", command=self.add, font=("Segoe UI", 11, "bold"), bg="#2ecc71", fg="white", cursor="hand2", bd=0).place(x=0, y=0, width=120, height=35)
-        btn_update = Button(btn_Frame, text="Update", command=self.update, font=("Segoe UI", 11, "bold"), bg="#f1c40f", fg="white", cursor="hand2", bd=0).place(x=135, y=0, width=120, height=35)
-        btn_delete = Button(btn_Frame, text="Delete", command=self.delete, font=("Segoe UI", 11, "bold"), bg="#e74c3c", fg="white", cursor="hand2", bd=0).place(x=270, y=0, width=120, height=35)
-        btn_clear = Button(btn_Frame, text="Clear", command=self.clear, font=("Segoe UI", 11, "bold"), bg="#95a5a6", fg="white", cursor="hand2", bd=0).place(x=405, y=0, width=120, height=35)
+        btn_add = Button(btn_Frame, text="ADD / SAVE", command=self.add, font=("Segoe UI", 10, "bold"), bg="#2ecc71", fg="white", cursor="hand2", bd=0).place(x=0, y=5, width=145, height=35)
+        btn_update = Button(btn_Frame, text="UPDATE DATA", command=self.update, font=("Segoe UI", 10, "bold"), bg="#f1c40f", fg="white", cursor="hand2", bd=0).place(x=160, y=5, width=145, height=35)
+        btn_delete = Button(btn_Frame, text="DELETE RECORD", command=self.delete, font=("Segoe UI", 10, "bold"), bg="#e74c3c", fg="white", cursor="hand2", bd=0).place(x=320, y=5, width=145, height=35)
+        btn_clear = Button(btn_Frame, text="CLEAR FORM", command=self.clear, font=("Segoe UI", 10, "bold"), bg="#95a5a6", fg="white", cursor="hand2", bd=0).place(x=480, y=5, width=145, height=35)
 
         #--- Treeview Section ---
         emp_frame = Frame(self.root, bd=3, relief=RIDGE)
-        emp_frame.place(x=20, y=410, width=1060, height=180)
+        emp_frame.place(x=20, y=435, width=1060, height=180)
 
         scrolly = Scrollbar(emp_frame, orient=VERTICAL)
         scrollx = Scrollbar(emp_frame, orient=HORIZONTAL)
 
-        # Style the Treeview
         style = ttk.Style()
         style.configure("Treeview", font=("Segoe UI", 10), rowheight=25)
         style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
@@ -122,7 +124,6 @@ class employeeClass:
         scrollx.config(command=self.EmployeeTable.xview)
         scrolly.config(command=self.EmployeeTable.yview)
 
-        # Headings (No Change)
         self.EmployeeTable.heading("eid", text="EMP ID")
         self.EmployeeTable.heading("name", text="Name")
         self.EmployeeTable.heading("email", text="Email")
@@ -137,7 +138,6 @@ class employeeClass:
 
         self.EmployeeTable["show"] = "headings"
 
-        # Columns Width (Optimized)
         for col in self.EmployeeTable["columns"]:
             self.EmployeeTable.column(col, width=100, anchor=CENTER)
 
@@ -146,13 +146,13 @@ class employeeClass:
 
         self.show()
 
-    #================ FUNCTIONS (Same as yours, just cleaned up) =================
+    #================ Functions =================
     
-    # ... (باقي الدوال كما هي تماماً في كودك الأصلي لضمان الربط بالقاعدة)
-    # ملاحظة: انقل دوال add, show, get_data, update, delete, clear, search هنا بنفس الكود الذي لديك.
+    def get_connection(self):
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
 
     def add(self):
-        con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        con = self.get_connection()
         cur = con.cursor()
         try:
             if self.var_name.get() == "":
@@ -183,7 +183,7 @@ class employeeClass:
             con.close()
 
     def show(self):
-        con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        con = self.get_connection()
         cur = con.cursor()
         try:
             cur.execute("select eid, name, email, gender, contact, dob, doj, pass, utype, address, salary from employee")
@@ -215,7 +215,7 @@ class employeeClass:
             self.var_salary.set(row[10])
 
     def update(self):
-        con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        con = self.get_connection()
         cur = con.cursor()
         try:
             if self.var_emp_id.get() == "":
@@ -241,7 +241,7 @@ class employeeClass:
             con.close()
 
     def delete(self):
-        con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        con = self.get_connection()
         cur = con.cursor()
         try:
             if self.var_emp_id.get() == "":
@@ -280,7 +280,7 @@ class employeeClass:
         self.show()
 
     def search(self):
-        con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        con = self.get_connection()
         cur = con.cursor()
         try:
             if self.var_searchby.get() == "Select":

@@ -19,8 +19,11 @@ class supplierClass:
         self.var_contact = StringVar()
 
         # --- Title ---
-        title = Label(self.root, text="SUPPLIER MANAGEMENT SYSTEM", font=("Segoe UI", 20, "bold"), bg="#2c3e50", fg="white", bd=3, relief=RIDGE)
-        title.pack(side=TOP, fill=X, padx=10, pady=10)
+        Header_Frame = Frame(self.root, bg="#0f172a", bd=0)
+        Header_Frame.pack(side=TOP, fill=X)
+        
+        title = Label(Header_Frame, text="📦 SUPPLIER RELATIONSHIP MANAGEMENT", font=("Segoe UI", 18, "bold"), bg="#0f172a", fg="white", pady=15)
+        title.pack()
 
         # --- Left Panel (Entry Fields) ---
         Left_Frame = Frame(self.root, bd=2, relief=RIDGE, bg="white")
@@ -96,7 +99,7 @@ class supplierClass:
 
         self.show()
 
-# ================= (Functions - لا تغيير في المنطق) =================
+# ================= (Functions) =================
 
     def get_connection(self):
         return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
