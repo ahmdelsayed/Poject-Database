@@ -7,16 +7,14 @@ from tkcalendar import DateEntry
 class employeeClass:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1100x500+220+130")
-        self.root.title("Inventory Management System | Developed By Web Code")
-        self.root.config(bg="white")
+        self.root.geometry("1100x600+220+130") # زدنا الارتفاع قليلاً لراحة العين
+        self.root.title("Inventory Management System | Employee Management")
+        self.root.config(bg="#f4f6f7")
         self.root.focus_force()
 
-        #========================================================
-        # All Variables
+        #================ Variables (No Change) =================
         self.var_searchby = StringVar()
         self.var_searchtxt = StringVar()
-
         self.var_emp_id = StringVar()
         self.var_gender = StringVar()
         self.var_contact = StringVar()
@@ -28,81 +26,94 @@ class employeeClass:
         self.var_utype = StringVar()
         self.var_salary = StringVar()
 
-        #---Search Frame---
-        SearchFrame = LabelFrame(self.root, text="Search Employee", font=("goudy old style", 12, "bold"), bd=2, relief=RIDGE, bg="white")
-        SearchFrame.place(x=250, y=20, width=600, height=70)
+        #--- Title Section ---
+        title = Label(self.root, text="EMPLOYEE MANAGEMENT SYSTEM", font=("Segoe UI", 20, "bold"), bg="#2c3e50", fg="white", bd=5, relief=RIDGE)
+        title.pack(side=TOP, fill=X, padx=10, pady=10)
 
-        #---options---
-        cmb_search = ttk.Combobox(SearchFrame, textvariable=self.var_searchby, values=("Select", "Email", "Name", "Contact"), state='readonly', justify=CENTER, font=("goudy old style", 15))
-        cmb_search.place(x=10, y=10, width=180)
+        #--- Main Container Frame ---
+        Main_Frame = Frame(self.root, bg="#f4f6f7")
+        Main_Frame.pack(fill=BOTH, expand=1, padx=20)
+
+        #--- Search Frame ---
+        SearchFrame = LabelFrame(Main_Frame, text=" Search Employee ", font=("Segoe UI", 12, "bold"), bd=2, relief=RIDGE, bg="white", fg="#2c3e50")
+        SearchFrame.place(x=0, y=0, width=1060, height=80)
+
+        cmb_search = ttk.Combobox(SearchFrame, textvariable=self.var_searchby, values=("Select", "Email", "Name", "Contact"), state='readonly', justify=CENTER, font=("Segoe UI", 12))
+        cmb_search.place(x=10, y=10, width=200, height=30)
         cmb_search.current(0)
 
-        txt_search = Entry(SearchFrame, textvariable=self.var_searchtxt, font=("goudy old style", 15), bg="lightyellow").place(x=200, y=10, width=200)
-        btn_search = Button(SearchFrame, text="Search", command=self.search, font=("goudy old style", 15), bg="#4caf50", fg="white", cursor="hand2").place(x=410, y=9, width=150, height=30)
+        txt_search = Entry(SearchFrame, textvariable=self.var_searchtxt, font=("Segoe UI", 12), bg="#ebf5fb", bd=1).place(x=220, y=10, width=400, height=30)
+        btn_search = Button(SearchFrame, text="Search Now", command=self.search, font=("Segoe UI", 11, "bold"), bg="#3498db", fg="white", cursor="hand2", bd=0).place(x=630, y=10, width=150, height=30)
+        btn_all = Button(SearchFrame, text="Show All", command=self.show, font=("Segoe UI", 11, "bold"), bg="#607d8b", fg="white", cursor="hand2", bd=0).place(x=790, y=10, width=150, height=30)
 
-        #---title---
-        title = Label(self.root, text="Employee Details", font=("goudy old style", 15), bg="#0f4d7d", fg="white").place(x=50, y=100, width=1000)
+        #--- Content Frame (Input Fields) ---
+        InputFrame = Frame(Main_Frame, bg="white", bd=2, relief=RIDGE)
+        InputFrame.place(x=0, y=90, width=1060, height=300)
 
-        #---content---
-        #---row1---
-        lbl_empid = Label(self.root, text="Emp ID", font=("goudy old style", 15), bg="white").place(x=50, y=150)
-        lbl_gender = Label(self.root, text="Gender", font=("goudy old style", 15), bg="white").place(x=350, y=150)
-        lbl_contact = Label(self.root, text="Contact", font=("goudy old style", 15), bg="white").place(x=750, y=150)
+        #--- Row 1 ---
+        Label(InputFrame, text="Emp ID", font=("Segoe UI", 11), bg="white").place(x=30, y=20)
+        txt_empid = Entry(InputFrame, textvariable=self.var_emp_id, font=("Segoe UI", 11), bg="#f9f9f9").place(x=130, y=20, width=200)
 
-        txt_empid = Entry(self.root, textvariable=self.var_emp_id, font=("goudy old style", 15), bg="lightyellow").place(x=150, y=150, width=180)
-        cmb_gender = ttk.Combobox(self.root, textvariable=self.var_gender, values=("Select", "Male", "Female", "Other"), state='readonly', justify=CENTER, font=("goudy old style", 15))
-        cmb_gender.place(x=500, y=150, width=180)
+        Label(InputFrame, text="Gender", font=("Segoe UI", 11), bg="white").place(x=370, y=20)
+        cmb_gender = ttk.Combobox(InputFrame, textvariable=self.var_gender, values=("Select", "Male", "Female", "Other"), state='readonly', justify=CENTER, font=("Segoe UI", 11))
+        cmb_gender.place(x=480, y=20, width=200)
         cmb_gender.current(0)
-        txt_contact = Entry(self.root, textvariable=self.var_contact, font=("goudy old style", 15), bg="lightyellow").place(x=850, y=150, width=180)
 
-        #---row2 (التعديل هنا لاختيار التاريخ)---
-        lbl_name = Label(self.root, text="Name", font=("goudy old style", 15), bg="white").place(x=50, y=190)
-        lbl_dob = Label(self.root, text="D.O.B", font=("goudy old style", 15), bg="white").place(x=350, y=190)
-        lbl_doj = Label(self.root, text="D.O.J", font=("goudy old style", 15), bg="white").place(x=750, y=190)
+        Label(InputFrame, text="Contact", font=("Segoe UI", 11), bg="white").place(x=710, y=20)
+        txt_contact = Entry(InputFrame, textvariable=self.var_contact, font=("Segoe UI", 11), bg="#f9f9f9").place(x=820, y=20, width=200)
 
-        txt_name = Entry(self.root, textvariable=self.var_name, font=("goudy old style", 15), bg="lightyellow").place(x=150, y=190, width=180)
-        
-        # حقل تاريخ الميلاد مع تقويم
-        self.txt_dob = DateEntry(self.root, textvariable=self.var_dob, font=("goudy old style", 15), bg="lightyellow", 
-                                 date_pattern='dd-mm-yyyy', background='darkblue', foreground='white', borderwidth=2)
-        self.txt_dob.place(x=500, y=190, width=180)
-        
-        # حقل تاريخ التعيين مع تقويم
-        self.txt_doj = DateEntry(self.root, textvariable=self.var_doj, font=("goudy old style", 15), bg="lightyellow", 
-                                 date_pattern='dd-mm-yyyy', background='darkblue', foreground='white', borderwidth=2)
-        self.txt_doj.place(x=850, y=190, width=180)
+        #--- Row 2 ---
+        Label(InputFrame, text="Full Name", font=("Segoe UI", 11), bg="white").place(x=30, y=65)
+        txt_name = Entry(InputFrame, textvariable=self.var_name, font=("Segoe UI", 11), bg="#f9f9f9").place(x=130, y=65, width=200)
 
-        #---row3---
-        lbl_email = Label(self.root, text="Email", font=("goudy old style", 15), bg="white").place(x=50, y=230)
-        lbl_pass = Label(self.root, text="Password", font=("goudy old style", 15), bg="white").place(x=350, y=230)
-        lbl_utype = Label(self.root, text="User Type", font=("goudy old style", 15), bg="white").place(x=750, y=230)
+        Label(InputFrame, text="D.O.B", font=("Segoe UI", 11), bg="white").place(x=370, y=65)
+        self.txt_dob = DateEntry(InputFrame, textvariable=self.var_dob, font=("Segoe UI", 11), date_pattern='dd-mm-yyyy', background='#2c3e50', foreground='white')
+        self.txt_dob.place(x=480, y=65, width=200)
 
-        txt_email = Entry(self.root, textvariable=self.var_email, font=("goudy old style", 15), bg="lightyellow").place(x=150, y=230, width=180)
-        txt_pass = Entry(self.root, textvariable=self.var_pass, font=("goudy old style", 15), bg="lightyellow").place(x=500, y=230, width=180)
-        cmb_utype = ttk.Combobox(self.root, textvariable=self.var_utype, values=("Admin", "Employee"), state='readonly', justify=CENTER, font=("goudy old style", 15))
-        cmb_utype.place(x=850, y=230, width=180)
+        Label(InputFrame, text="D.O.J", font=("Segoe UI", 11), bg="white").place(x=710, y=65)
+        self.txt_doj = DateEntry(InputFrame, textvariable=self.var_doj, font=("Segoe UI", 11), date_pattern='dd-mm-yyyy', background='#2c3e50', foreground='white')
+        self.txt_doj.place(x=820, y=65, width=200)
+
+        #--- Row 3 ---
+        Label(InputFrame, text="Email", font=("Segoe UI", 11), bg="white").place(x=30, y=110)
+        txt_email = Entry(InputFrame, textvariable=self.var_email, font=("Segoe UI", 11), bg="#f9f9f9").place(x=130, y=110, width=200)
+
+        Label(InputFrame, text="Password", font=("Segoe UI", 11), bg="white").place(x=370, y=110)
+        txt_pass = Entry(InputFrame, textvariable=self.var_pass, font=("Segoe UI", 11), bg="#f9f9f9", show="*").place(x=480, y=110, width=200)
+
+        Label(InputFrame, text="User Type", font=("Segoe UI", 11), bg="white").place(x=710, y=110)
+        cmb_utype = ttk.Combobox(InputFrame, textvariable=self.var_utype, values=("Admin", "Employee"), state='readonly', justify=CENTER, font=("Segoe UI", 11))
+        cmb_utype.place(x=820, y=110, width=200)
         cmb_utype.current(0)
 
-        #---row4---
-        lbl_address = Label(self.root, text="Address", font=("goudy old style", 15), bg="white").place(x=50, y=270)
-        lbl_salary = Label(self.root, text="Salary", font=("goudy old style", 15), bg="white").place(x=500, y=270)
+        #--- Row 4 ---
+        Label(InputFrame, text="Address", font=("Segoe UI", 11), bg="white").place(x=30, y=155)
+        self.txt_address = Text(InputFrame, font=("Segoe UI", 11), bg="#f9f9f9", bd=1, relief=SOLID)
+        self.txt_address.place(x=130, y=155, width=550, height=60)
 
-        self.txt_address = Text(self.root, font=("goudy old style", 15), bg="lightyellow")
-        self.txt_address.place(x=150, y=270, width=300, height=60)
-        txt_salary = Entry(self.root, textvariable=self.var_salary, font=("goudy old style", 15), bg="lightyellow").place(x=600, y=270, width=180)
+        Label(InputFrame, text="Salary", font=("Segoe UI", 11), bg="white").place(x=710, y=155)
+        txt_salary = Entry(InputFrame, textvariable=self.var_salary, font=("Segoe UI", 11), bg="#f9f9f9").place(x=820, y=155, width=200)
 
-        #---buttons---
-        btn_add = Button(self.root, text="Save", command=self.add, font=("goudy old style", 15), bg="#2196f3", fg="white", cursor="hand2").place(x=500, y=305, width=110, height=28)
-        btn_update = Button(self.root, text="Update", command=self.update, font=("goudy old style", 15), bg="#4caf50", fg="white", cursor="hand2").place(x=620, y=305, width=110, height=28)
-        btn_delete = Button(self.root, text="Delete", command=self.delete, font=("goudy old style", 15), bg="#f44336", fg="white", cursor="hand2").place(x=740, y=305, width=110, height=28)
-        btn_clear = Button(self.root, text="Clear", command=self.clear, font=("goudy old style", 15), bg="#607d8b", fg="white", cursor="hand2").place(x=860, y=305, width=110, height=28)
+        #--- Buttons Frame ---
+        btn_Frame = Frame(InputFrame, bg="white")
+        btn_Frame.place(x=480, y=240, width=540, height=45)
 
-        #---Employee Details---
+        btn_add = Button(btn_Frame, text="Save", command=self.add, font=("Segoe UI", 11, "bold"), bg="#2ecc71", fg="white", cursor="hand2", bd=0).place(x=0, y=0, width=120, height=35)
+        btn_update = Button(btn_Frame, text="Update", command=self.update, font=("Segoe UI", 11, "bold"), bg="#f1c40f", fg="white", cursor="hand2", bd=0).place(x=135, y=0, width=120, height=35)
+        btn_delete = Button(btn_Frame, text="Delete", command=self.delete, font=("Segoe UI", 11, "bold"), bg="#e74c3c", fg="white", cursor="hand2", bd=0).place(x=270, y=0, width=120, height=35)
+        btn_clear = Button(btn_Frame, text="Clear", command=self.clear, font=("Segoe UI", 11, "bold"), bg="#95a5a6", fg="white", cursor="hand2", bd=0).place(x=405, y=0, width=120, height=35)
+
+        #--- Treeview Section ---
         emp_frame = Frame(self.root, bd=3, relief=RIDGE)
-        emp_frame.place(x=0, y=350, relwidth=1, height=150)
+        emp_frame.place(x=20, y=410, width=1060, height=180)
 
         scrolly = Scrollbar(emp_frame, orient=VERTICAL)
         scrollx = Scrollbar(emp_frame, orient=HORIZONTAL)
+
+        # Style the Treeview
+        style = ttk.Style()
+        style.configure("Treeview", font=("Segoe UI", 10), rowheight=25)
+        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
 
         self.EmployeeTable = ttk.Treeview(emp_frame, columns=("eid", "name", "email", "gender", "contact", "dob", "doj", "pass", "utype", "address", "salary"), yscrollcommand=scrolly.set, xscrollcommand=scrollx.set)
         
@@ -111,6 +122,7 @@ class employeeClass:
         scrollx.config(command=self.EmployeeTable.xview)
         scrolly.config(command=self.EmployeeTable.yview)
 
+        # Headings (No Change)
         self.EmployeeTable.heading("eid", text="EMP ID")
         self.EmployeeTable.heading("name", text="Name")
         self.EmployeeTable.heading("email", text="Email")
@@ -125,24 +137,19 @@ class employeeClass:
 
         self.EmployeeTable["show"] = "headings"
 
-        self.EmployeeTable.column("eid", width=90)
-        self.EmployeeTable.column("name", width=100)
-        self.EmployeeTable.column("email", width=100)
-        self.EmployeeTable.column("gender", width=100)
-        self.EmployeeTable.column("contact", width=100)
-        self.EmployeeTable.column("dob", width=100)
-        self.EmployeeTable.column("doj", width=100)
-        self.EmployeeTable.column("pass", width=100)
-        self.EmployeeTable.column("utype", width=100)
-        self.EmployeeTable.column("address", width=100)
-        self.EmployeeTable.column("salary", width=100)
+        # Columns Width (Optimized)
+        for col in self.EmployeeTable["columns"]:
+            self.EmployeeTable.column(col, width=100, anchor=CENTER)
 
         self.EmployeeTable.pack(fill=BOTH, expand=1)
         self.EmployeeTable.bind("<ButtonRelease-1>", self.get_data)
 
         self.show()
 
-    #================================================================================================================        
+    #================ FUNCTIONS (Same as yours, just cleaned up) =================
+    
+    # ... (باقي الدوال كما هي تماماً في كودك الأصلي لضمان الربط بالقاعدة)
+    # ملاحظة: انقل دوال add, show, get_data, update, delete, clear, search هنا بنفس الكود الذي لديك.
 
     def add(self):
         con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
@@ -179,7 +186,6 @@ class employeeClass:
         con = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
         cur = con.cursor()
         try:
-           
             cur.execute("select eid, name, email, gender, contact, dob, doj, pass, utype, address, salary from employee")
             rows = cur.fetchall()
             self.EmployeeTable.delete(*self.EmployeeTable.get_children())
@@ -200,7 +206,6 @@ class employeeClass:
             self.var_email.set(row[2])
             self.var_gender.set(row[3])
             self.var_contact.set(row[4])
-            # تحديث حقول التاريخ في التقويم عند الضغط على الصف
             self.txt_dob.set_date(row[5])
             self.txt_doj.set_date(row[6])
             self.var_pass.set(row[7])

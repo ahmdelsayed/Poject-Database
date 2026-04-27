@@ -43,21 +43,6 @@ def create_db():
         END
         """)
 
-        # == supplier ==
-        cur.execute("""
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[supplier]') AND type in (N'U'))
-        BEGIN
-             CREATE TABLE supplier(
-                 invoice INT PRIMARY KEY,
-                 name VARCHAR(100),
-                 contact VARCHAR(20),
-                 desc VARCHAR(MAX)
-            )
-        END
-        """)
-
-        
-        
         print("SQL Server Database and Table are ready!")
         
     except Exception as ex:

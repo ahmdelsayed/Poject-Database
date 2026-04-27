@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 from employee import employeeClass
 import pyodbc
 from supplier import supplierClass
+from category import categoryClass
 
 
 class IMS:
@@ -131,7 +132,7 @@ class IMS:
         menus = {
             "Employee": self.employee,
             "Supplier": self.supplier,
-            "Category": None, # تقدر تضيف الدوال بتاعتهم هنا لما تجهز
+            "Category": self.category, # تقدر تضيف الدوال بتاعتهم هنا لما تجهز
             "Products": None,
             "Sales": None,
             "Exit": self.root.quit
@@ -167,7 +168,7 @@ class IMS:
         self.lbl_supplier = Button(self.Main_Frame, text="Total Supplier\n[ 0 ]", command=self.supplier, bd=0, bg="#9B59B6", fg="white", font=card_font, cursor="hand2")
         self.lbl_supplier.grid(row=0, column=1, padx=15, pady=15, sticky="nsew")
 
-        self.lbl_category = Button(self.Main_Frame, text="Total Category\n[ 0 ]", bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
+        self.lbl_category = Button(self.Main_Frame, text="Total Category\n[ 0 ]", command=self.category, bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
         self.lbl_category.grid(row=0, column=2, padx=15, pady=15, sticky="nsew")
 
         self.lbl_product = Button(self.Main_Frame, text="Total Product\n[ 0 ]", bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
@@ -220,7 +221,11 @@ class IMS:
 
     def supplier(self):
         self.new_win = Toplevel(self.root) 
-        self.new_obj = supplierClass(self.new_win)     
+        self.new_obj = supplierClass(self.new_win)  
+
+    def category(self):
+        self.new_win = Toplevel(self.root)
+        self.new_obj = categoryClass(self.new_win)       
 
 if __name__ == "__main__":
     root = Tk()
