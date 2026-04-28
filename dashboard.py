@@ -5,6 +5,7 @@ import pyodbc
 from supplier import supplierClass
 from category import categoryClass
 from product import productClass
+from sales import salesClass
 
 
 class IMS:
@@ -135,7 +136,7 @@ class IMS:
             "Supplier": self.supplier,
             "Category": self.category, 
             "Products": self.product,
-            "Sales": None,
+            "Sales": self.sales,
             "Exit": self.root.quit
         }
 
@@ -175,7 +176,7 @@ class IMS:
         self.lbl_product = Button(self.Main_Frame, text="Total Product\n[ 0 ]", command=self.product, bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
         self.lbl_product.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
 
-        self.lbl_sales = Button(self.Main_Frame, text="Total Sales\n[ 0 ]", bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
+        self.lbl_sales = Button(self.Main_Frame, text="Total Sales\n[ 0 ]", command=self.sales, bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
         self.lbl_sales.grid(row=1, column=1, padx=15, pady=15, sticky="nsew")
 
         self.Main_Frame.columnconfigure((0, 1, 2), weight=1)
@@ -232,7 +233,9 @@ class IMS:
         self.new_win = Toplevel(self.root)
         self.new_obj = productClass(self.new_win)       
 
-
+    def sales(self):
+        self.new_win = Toplevel(self.root)
+        self.new_obj = salesClass(self.new_win)
 
 if __name__ == "__main__":
     root = Tk()

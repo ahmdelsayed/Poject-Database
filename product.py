@@ -11,7 +11,7 @@ class productClass:
         self.root.config(bg="#f4f6f7")
         self.root.focus_force()
 
-        #================ Variables (No Change) =================
+        #================ Variables =================
         self.var_cat = StringVar()
         self.var_sup = StringVar()
         self.cat_list = []
