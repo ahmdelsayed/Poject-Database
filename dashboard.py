@@ -1,4 +1,4 @@
-from tkinter import * 
+from tkinter import *
 from PIL import Image, ImageTk 
 from employee import employeeClass
 import pyodbc
@@ -6,7 +6,8 @@ from supplier import supplierClass
 from category import categoryClass
 from product import productClass
 from sales import salesClass
-
+import time
+import os
 
 class IMS:
     def __init__(self, root):
@@ -78,7 +79,8 @@ class IMS:
             cursor="hand2",
             bd=0,
             padx=15,
-            pady=5
+            pady=5,
+            command=self.logout
         )
         btn_logout.pack(side=RIGHT, padx=20, pady=15)
 
@@ -129,7 +131,7 @@ class IMS:
         )
         self.lbl_menu_title.pack(side=TOP, fill=X, pady=(0, 10))
 
-        # == Left Menu ==
+        # == Menu Buttons ==
         self.menu_btns = []
         menus = {
             "Employee": self.employee,
@@ -158,26 +160,32 @@ class IMS:
             btn.pack(side=TOP, fill=X)
             self.menu_btns.append(btn)
 
-        # == Main Dashboard ==
+        # == Main Dashboard Content (Cards) ==
         self.Main_Frame = Frame(self.root, bg=self.themes["light"]["bg"])
         self.Main_Frame.place(x=230, y=120, relwidth=0.8, relheight=0.7)
 
         card_font = ("Segoe UI", 18, "bold")
         
-        self.lbl_employee = Button(self.Main_Frame, text="Total Employee\n[ 0 ]", command=self.employee, bd=0, bg="#3498DB", fg="white", font=card_font, cursor="hand2")
+        # تصحيح: استخدام Label بدلاً من Button لحل مشكلة الـ command والاحتفاظ بالشكل
+        self.lbl_employee = Label(self.Main_Frame, text="Total Employee\n[ 0 ]", bd=0, bg="#3498DB", fg="white", font=card_font, cursor="hand2")
         self.lbl_employee.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
+        self.lbl_employee.bind("<Button-1>", lambda e: self.employee())
 
-        self.lbl_supplier = Button(self.Main_Frame, text="Total Supplier\n[ 0 ]", command=self.supplier, bd=0, bg="#9B59B6", fg="white", font=card_font, cursor="hand2")
+        self.lbl_supplier = Label(self.Main_Frame, text="Total Supplier\n[ 0 ]", bd=0, bg="#9B59B6", fg="white", font=card_font, cursor="hand2")
         self.lbl_supplier.grid(row=0, column=1, padx=15, pady=15, sticky="nsew")
+        self.lbl_supplier.bind("<Button-1>", lambda e: self.supplier())
 
-        self.lbl_category = Button(self.Main_Frame, text="Total Category\n[ 0 ]", command=self.category, bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
+        self.lbl_category = Label(self.Main_Frame, text="Total Category\n[ 0 ]", bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
         self.lbl_category.grid(row=0, column=2, padx=15, pady=15, sticky="nsew")
+        self.lbl_category.bind("<Button-1>", lambda e: self.category())
 
-        self.lbl_product = Button(self.Main_Frame, text="Total Product\n[ 0 ]", command=self.product, bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
+        self.lbl_product = Label(self.Main_Frame, text="Total Product\n[ 0 ]", bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
         self.lbl_product.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
+        self.lbl_product.bind("<Button-1>", lambda e: self.product())
 
-        self.lbl_sales = Button(self.Main_Frame, text="Total Sales\n[ 0 ]", command=self.sales, bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
+        self.lbl_sales = Label(self.Main_Frame, text="Total Sales\n[ 0 ]", bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
         self.lbl_sales.grid(row=1, column=1, padx=15, pady=15, sticky="nsew")
+        self.lbl_sales.bind("<Button-1>", lambda e: self.sales())
 
         self.Main_Frame.columnconfigure((0, 1, 2), weight=1)
         self.Main_Frame.rowconfigure((0, 1), weight=1)
@@ -192,6 +200,55 @@ class IMS:
         )
         self.lbl_footer.pack(side=BOTTOM, fill=X)
 
+        self.update_content() # تحديث أولي للأرقام
+        self.update_date_time() # تشغيل الساعة الحية
+
+    # ================== الدوال الوظيفية ==================
+
+    def get_connection(self):
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+
+    def update_date_time(self):
+        """تحديث الوقت والتاريخ كل ثانية"""
+        time_ = time.strftime("%I:%M:%S")
+        date_ = time.strftime("%d-%m-%Y")
+        self.lbl_clock.config(text=f"Welcome to Inventory Management System\t\t Date: {date_}\t\t Time: {time_}")
+        self.lbl_clock.after(200, self.update_date_time)
+
+    def update_content(self):
+        """جلب الأعداد الحقيقية من قاعدة البيانات وتحديث الكروت"""
+        con = self.get_connection()
+        cur = con.cursor()
+        try:
+            cur.execute("select * from product")
+            res = cur.fetchall()
+            self.lbl_product.config(text=f"Total Product\n[ {str(len(res))} ]")
+
+            cur.execute("select * from supplier")
+            res = cur.fetchall()
+            self.lbl_supplier.config(text=f"Total Supplier\n[ {str(len(res))} ]")
+
+            cur.execute("select * from category")
+            res = cur.fetchall()
+            self.lbl_category.config(text=f"Total Category\n[ {str(len(res))} ]")
+
+            cur.execute("select * from employee")
+            res = cur.fetchall()
+            self.lbl_employee.config(text=f"Total Employee\n[ {str(len(res))} ]")
+
+            bill_count = len(os.listdir('bill')) if os.path.exists('bill') else 0
+            self.lbl_sales.config(text=f"Total Sales\n[ {str(bill_count)} ]")
+
+        except Exception as ex:
+            messagebox.showerror("Error", f"Error due to : {str(ex)}", parent=self.root)
+        finally:
+            con.close()
+
+    def logout(self):
+        op = messagebox.askyesno("Confirm", "Do you really want to logout?", parent=self.root)
+        if op == True:
+            self.root.destroy()
+
     def toggle_theme(self):
         self.is_dark_mode = not self.is_dark_mode
         theme = self.themes["dark"] if self.is_dark_mode else self.themes["light"]
@@ -202,7 +259,6 @@ class IMS:
         self.lbl_clock.config(bg=theme["clock_bg"])
         self.lbl_footer.config(bg=theme["header"])
         self.Main_Frame.config(bg=theme["bg"])
-        
         self.LeftMenu.config(bg=theme["menu_bg"])
         self.lbl_menuLogo.config(bg=theme["menu_bg"])
         
@@ -214,12 +270,11 @@ class IMS:
         else:
             self.btn_theme.config(text="🌙 Dark Mode", bg="#F1C40F", fg="black")
 
-#=====================================================================================================================
+    # ================== التنقل بين الصفحات ==================
 
     def employee(self):
         self.new_win = Toplevel(self.root) 
-        self.new_obj = employeeClass(self.new_win) # Change this to employeeClass
-
+        self.new_obj = employeeClass(self.new_win)
 
     def supplier(self):
         self.new_win = Toplevel(self.root) 
@@ -238,6 +293,7 @@ class IMS:
         self.new_obj = salesClass(self.new_win)
 
 if __name__ == "__main__":
+    from tkinter import messagebox
     root = Tk()
     obj = IMS(root)
     root.mainloop()
