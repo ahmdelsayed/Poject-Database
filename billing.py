@@ -9,7 +9,7 @@ import tempfile
 class BillClass:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1350x720+0+0")
+        self.root.geometry("1370x720+0+0")
         self.root.title("Inventory Management System | Complete Billing Module")
         self.root.config(bg="#f4f6f7")
         self.cart_list = [] 
@@ -128,7 +128,7 @@ class BillClass:
 
         # --- (5) إطار الفاتورة ---
         BillFrame = LabelFrame(self.root, text=" 🧾 Invoice Details ", font=("Segoe UI", 12, "bold"), bd=2, bg="white", fg="#2c3e50")
-        BillFrame.place(x=955, y=110, width=380, height=415)
+        BillFrame.place(x=955, y=110, width=400, height=415)
         scrolly_t = Scrollbar(BillFrame, orient=VERTICAL)
         self.txt_bill_area = Text(BillFrame, font=("Consolas", 11), bg="#fffbeb", yscrollcommand=scrolly_t.set, bd=0)
         scrolly_t.pack(side=RIGHT, fill=Y)

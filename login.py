@@ -1,5 +1,5 @@
 from tkinter import *
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk 
 from tkinter import messagebox
 import pyodbc
 import os
@@ -8,74 +8,43 @@ import time
 class Login_System:
     def __init__(self, root):
         self.root = root
-        self.root.title("Login System | Inventory Management System")
+        self.root.title("Login System | Inventory Management")
         self.root.geometry("1350x700+0+0")
-        self.root.config(bg="#fafafa")
+        self.root.config(bg="#0b1220") 
         self.root.state('zoomed')
 
-        # === المتغيرات ===
+        # المتغيرات
         self.employee_id = StringVar()
         self.password = StringVar()
+        self.otp = StringVar() 
+        self.new_pass = StringVar()
+        self.conf_pass = StringVar()
+        self.actual_eid = "" # متغير لحفظ الـ ID الحقيقي بعد العثور عليه بالإيميل
 
-        # === إطار الصور (مع معالجة خطأ عدم وجود الصور) ===
-        try:
-            # تحميل صورة الموبايل الأساسية
-            self.phone_image = ImageTk.PhotoImage(file="images/phone.png")
-            self.lbl_phone_image = Label(self.root, image=self.phone_image, bd=0, bg="#fafafa")
-            self.lbl_phone_image.place(x=200, y=50)
-            
-            # تحميل الصور المتحركة داخل الموبايل
-            self.im1 = ImageTk.PhotoImage(file="images/im1.png")
-            self.im2 = ImageTk.PhotoImage(file="images/im2.png")
-            self.im3 = ImageTk.PhotoImage(file="images/im3.png")
+        # === Glass Card (إطار تسجيل الدخول) ===
+        login_frame = Frame(self.root, bg="#111827", highlightbackground="#1f2937", highlightthickness=1)
+        login_frame.place(relx=0.5, rely=0.45, anchor=CENTER, width=420, height=520)
 
-            self.lbl_change_image = Label(self.root, bg="white")
-            self.lbl_change_image.place(x=367, y=153, width=240, height=428)
-            self.animate()
-        except Exception as e:
-            print(f"Warning: Images folder or files missing. Error: {e}")
-            # في حالة عدم وجود صور، يتم وضع إطار رمادي بدلاً من الـ Crash
-            Label(self.root, text="[ Image Placeholder ]", font=("Segoe UI", 20), bg="lightgray", fg="gray").place(x=200, y=50, width=410, height=550)
+        # === Title ===
+        Label(login_frame, text="Login System", font=("Segoe UI", 28, "bold"), bg="#111827", fg="#e5e7eb").pack(pady=(30, 20))
 
-        # === إطار تسجيل الدخول (Login Frame) ===
-        login_frame = Frame(self.root, bd=2, relief=RIDGE, bg="white")
-        login_frame.place(x=650, y=90, width=350, height=460)
+        # === Username Input ===
+        Label(login_frame, text="Username / ID / Email", font=("Segoe UI", 10), bg="#111827", fg="#9ca3af").pack(anchor="w", padx=40)
+        self.user_entry = Entry(login_frame, textvariable=self.employee_id, font=("Segoe UI", 12), bg="#1f2937", fg="white", insertbackground="white", bd=0)
+        self.user_entry.pack(padx=40, pady=8, ipady=10, fill=X)
 
-        title = Label(login_frame, text="Login System", font=("Segoe UI", 30, "bold"), bg="white", fg="#010c48")
-        title.pack(side=TOP, fill=X, pady=30)
+        # === Password Input ===
+        Label(login_frame, text="Password", font=("Segoe UI", 10), bg="#111827", fg="#9ca3af").pack(anchor="w", padx=40, pady=(10, 0))
+        self.pass_entry = Entry(login_frame, textvariable=self.password, show="*", font=("Segoe UI", 12), bg="#1f2937", fg="white", insertbackground="white", bd=0)
+        self.pass_entry.pack(padx=40, pady=8, ipady=10, fill=X)
 
-        lbl_user = Label(login_frame, text="Employee ID", font=("Segoe UI", 13), bg="white", fg="#767676")
-        lbl_user.place(x=50, y=100)
-        txt_employee_id = Entry(login_frame, textvariable=self.employee_id, font=("Segoe UI", 13), bg="#ECECEC", bd=1)
-        txt_employee_id.place(x=50, y=130, width=250, height=35)
+        # === Login Button ===
+        self.login_btn = Button(login_frame, text="Log In", command=self.login, font=("Segoe UI", 13, "bold"), bg="#2563eb", fg="white", activebackground="#1d4ed8", activeforeground="white", bd=0, cursor="hand2")
+        self.login_btn.pack(padx=40, pady=25, fill=X, ipady=10)
 
-        lbl_pass = Label(login_frame, text="Password", font=("Segoe UI", 13), bg="white", fg="#767676")
-        lbl_pass.place(x=50, y=190)
-        txt_pass = Entry(login_frame, textvariable=self.password, show="*", font=("Segoe UI", 13), bg="#ECECEC", bd=1)
-        txt_pass.place(x=50, y=220, width=250, height=35)
+        # === Forget Password ===
+        Button(login_frame, text="Forget Password?", command=self.forget_window, font=("Segoe UI", 10), bg="#111827", fg="#60a5fa", bd=0, cursor="hand2", activebackground="#111827", activeforeground="#2563eb").pack()
 
-        btn_login = Button(login_frame, text="Log In", command=self.login, font=("Segoe UI", 15, "bold"), bg="#007bff", activebackground="#0056b3", fg="white", activeforeground="white", cursor="hand2", bd=0)
-        btn_login.place(x=50, y=290, width=250, height=40)
-
-        hr = Label(login_frame, bg="lightgray").place(x=50, y=370, width=250, height=2)
-        or_ = Label(login_frame, text="OR", bg="white", fg="lightgray", font=("Segoe UI", 12, "bold")).place(x=158, y=358)
-
-        btn_forget = Button(login_frame, text="Forget Password?", command=self.forget_window, font=("Segoe UI", 11), bg="white", fg="#007bff", bd=0, activebackground="white", activeforeground="#0056b3", cursor="hand2")
-        btn_forget.place(x=105, y=390)
-
-        # === إطار سفلي إضافي ===
-        footer_frame = Frame(self.root, bd=2, relief=RIDGE, bg="white")
-        footer_frame.place(x=650, y=570, width=350, height=60)
-        Label(footer_frame, text="Inventory Management System", font=("Segoe UI", 12), bg="white").place(x=0, y=15, relwidth=1)
-
-    # === دوال الأنيميشن ===
-    def animate(self):
-        self.img = self.im1
-        self.im1, self.im2, self.im3 = self.im2, self.im3, self.im1
-        self.lbl_change_image.config(image=self.img)
-        self.lbl_change_image.after(2000, self.animate)
-
-    # === وظيفة تسجيل الدخول والاتصال بالداتا بيز ===
     def get_connection(self):
         return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
 
@@ -86,72 +55,90 @@ class Login_System:
             if self.employee_id.get() == "" or self.password.get() == "":
                 messagebox.showerror("Error", "All fields are required", parent=self.root)
             else:
-                cur.execute("select utype from employee where eid=? and pass=?", (self.employee_id.get(), self.password.get()))
+                input_val = str(self.employee_id.get())
+                pas_val = str(self.password.get())
+                # تسجيل الدخول يدعم (ID أو الاسم أو الإيميل)
+                query = "select utype from employee where (CAST(eid AS VARCHAR) = ? OR name = ? OR email = ?) and pass = ?"
+                cur.execute(query, (input_val, input_val, input_val, pas_val))
                 user = cur.fetchone()
+                
                 if user is None:
-                    messagebox.showerror("Error", "Invalid Employee ID or Password", parent=self.root)
+                    messagebox.showerror("Error", "Invalid Credentials", parent=self.root)
                 else:
+                    user_type = user[0]
                     self.root.destroy()
-                    # استدعاء ملف الداشبورد
-                    os.system("python dashboard.py")
+                    os.system(f"python dashboard.py {user_type}")
         except Exception as ex:
-            messagebox.showerror("Error", f"Database Connection Error: {str(ex)}", parent=self.root)
-        finally:
-            con.close()
+            messagebox.showerror("Error", f"Database Error: {str(ex)}", parent=self.root)
+        finally: con.close()
 
-    # === شاشة نسيان كلمة المرور ===
+    # ================= وظيفة استعادة كلمة المرور المحدثة =================
     def forget_window(self):
-        if self.employee_id.get() == "":
-            messagebox.showerror("Error", "Please enter Employee ID to reset password", parent=self.root)
-            return
-
         con = self.get_connection()
         cur = con.cursor()
         try:
-            cur.execute("select email from employee where eid=?", (self.employee_id.get(),))
-            email = cur.fetchone()
-            if email is None:
-                messagebox.showerror("Error", "Invalid Employee ID", parent=self.root)
+            input_user = self.employee_id.get()
+            if input_user == "":
+                messagebox.showerror("Error", "Please enter User ID or Email to reset password", parent=self.root)
+                return
+            
+            # البحث عن الموظف باستخدام (ID أو الإيميل أو الاسم)
+            query = "select email, eid from employee where (CAST(eid AS VARCHAR) = ? OR email = ? OR name = ?)"
+            cur.execute(query, (input_user, input_user, input_user))
+            row = cur.fetchone()
+            
+            if row is None:
+                messagebox.showerror("Error", "Invalid User ID / Email", parent=self.root)
             else:
-                self.var_new_pass = StringVar()
-                self.var_conf_pass = StringVar()
-                
+                # حفظ الـ ID الحقيقي لاستخدامه في عملية التحديث لاحقاً
+                self.actual_eid = str(row[1])
+                user_email = row[0]
+
+                # --- تصميم نافذة Reset Password ---
                 self.forget_win = Toplevel(self.root)
                 self.forget_win.title("RESET PASSWORD")
-                self.forget_win.geometry("400x350+500+150")
+                self.forget_win.geometry("400x480+500+150")
+                self.forget_win.config(bg="#111827")
                 self.forget_win.focus_force()
 
-                title = Label(self.forget_win, text="Reset Password", font=("Segoe UI", 20, "bold"), bg="#010c48", fg="white").pack(side=TOP, fill=X)
+                title = Label(self.forget_win, text="Reset Password", font=("Segoe UI", 20, "bold"), bg="#1f2937", fg="white").pack(side=TOP, fill=X)
                 
-                Label(self.forget_win, text="New Password", font=("Segoe UI", 12)).place(x=20, y=70)
-                Entry(self.forget_win, textvariable=self.var_new_pass, show="*", font=("Segoe UI", 12), bg="lightyellow").place(x=20, y=105, width=300, height=30)
+                # جزء الـ OTP
+                lbl_otp = Label(self.forget_win, text=f"OTP sent to: {user_email[:3]}***{user_email[-10:]}", font=("Segoe UI", 10), bg="#111827", fg="#9ca3af").place(x=20, y=60)
+                txt_otp = Entry(self.forget_win, textvariable=self.otp, font=("Segoe UI", 12), bg="#1f2937", fg="white", bd=0).place(x=20, y=90, width=250, height=35)
+                
+                btn_verify = Button(self.forget_win, text="VERIFY", font=("Segoe UI", 10, "bold"), bg="#3b82f6", fg="white", bd=0, cursor="hand2").place(x=280, y=90, width=80, height=35)
 
-                Label(self.forget_win, text="Confirm Password", font=("Segoe UI", 12)).place(x=20, y=160)
-                Entry(self.forget_win, textvariable=self.var_conf_pass, show="*", font=("Segoe UI", 12), bg="lightyellow").place(x=20, y=195, width=300, height=30)
+                # حقول كلمة المرور الجديدة
+                lbl_new_pass = Label(self.forget_win, text="New Password", font=("Segoe UI", 11), bg="#111827", fg="#9ca3af").place(x=20, y=160)
+                txt_new_pass = Entry(self.forget_win, textvariable=self.new_pass, show="*", font=("Segoe UI", 12), bg="#1f2937", fg="white", bd=0).place(x=20, y=190, width=340, height=35)
 
-                Button(self.forget_win, text="Update Password", command=self.update_password, font=("Segoe UI", 13, "bold"), bg="#28a745", fg="white", cursor="hand2", bd=0).place(x=100, y=260, width=200, height=40)
+                lbl_conf_pass = Label(self.forget_win, text="Confirm Password", font=("Segoe UI", 11), bg="#111827", fg="#9ca3af").place(x=20, y=260)
+                txt_conf_pass = Entry(self.forget_win, textvariable=self.conf_pass, show="*", font=("Segoe UI", 12), bg="#1f2937", fg="white", bd=0).place(x=20, y=290, width=340, height=35)
+
+                btn_update = Button(self.forget_win, text="UPDATE PASSWORD", command=self.update_password, font=("Segoe UI", 13, "bold"), bg="#10b981", fg="white", bd=0, cursor="hand2").place(x=20, y=380, width=340, height=45)
+
         except Exception as ex:
             messagebox.showerror("Error", str(ex), parent=self.root)
-        finally:
-            con.close()
+        finally: con.close()
 
     def update_password(self):
-        if self.var_new_pass.get() == "" or self.var_conf_pass.get() == "":
-            messagebox.showerror("Error", "Password fields cannot be empty", parent=self.forget_win)
-        elif self.var_new_pass.get() != self.var_conf_pass.get():
-            messagebox.showerror("Error", "Passwords do not match", parent=self.forget_win)
+        if self.new_pass.get() == "" or self.conf_pass.get() == "":
+            messagebox.showerror("Error", "Password is required", parent=self.forget_win)
+        elif self.new_pass.get() != self.conf_pass.get():
+            messagebox.showerror("Error", "New Password & Confirm Password must be same", parent=self.forget_win)
         else:
             con = self.get_connection()
             cur = con.cursor()
             try:
-                cur.execute("update employee set pass=? where eid=?", (self.var_new_pass.get(), self.employee_id.get()))
+                # نستخدم self.actual_eid الذي جلبناه في الخطوة السابقة
+                cur.execute("update employee set pass=? where eid=?", (self.new_pass.get(), self.actual_eid))
                 con.commit()
                 messagebox.showinfo("Success", "Password updated successfully", parent=self.forget_win)
                 self.forget_win.destroy()
             except Exception as ex:
                 messagebox.showerror("Error", str(ex), parent=self.forget_win)
-            finally:
-                con.close()
+            finally: con.close()
 
 if __name__ == "__main__":
     root = Tk()
