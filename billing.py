@@ -14,7 +14,7 @@ class BillClass:
         self.root.config(bg="#f4f6f7")
         self.cart_list = [] 
 
-        # --- المتغيرات (Variables) ---
+        # --- (Variables) ---
         self.var_search = StringVar()
         self.var_cname = StringVar()
         self.var_contact = StringVar()
@@ -142,7 +142,7 @@ class BillClass:
         self.lbl_amnt.place(x=0, y=5, width=120, height=60)
         
         # التعديل المطلوب: تم تغيير العنوان ليعرض قيمة الخصم الفعلية
-        self.lbl_discount = Label(BillMenuFrame, text="Discount\n0.00", font=("Segoe UI", 12, "bold"), bg="#2ecc71", fg="white", bd=1, relief=SOLID)
+        self.lbl_discount = Label(BillMenuFrame, text="Discount 5%\n0.00", font=("Segoe UI", 12, "bold"), bg="#2ecc71", fg="white", bd=1, relief=SOLID)
         self.lbl_discount.place(x=125, y=5, width=120, height=60)
         
         self.lbl_net_pay = Label(BillMenuFrame, text="Net Pay\n0.00", font=("Segoe UI", 12, "bold"), bg="#e74c3c", fg="white", bd=1, relief=SOLID)
