@@ -9,12 +9,13 @@ import tempfile
 class BillClass:
     def __init__(self, root):
         self.root = root
+        # == Window Setup ==
         self.root.geometry("1370x720+0+0")
         self.root.title("Inventory Management System | Complete Billing Module")
         self.root.config(bg="#f4f6f7")
         self.cart_list = [] 
 
-        # --- (Variables) ---
+        # == Variables Declaration ==
         self.var_search = StringVar()
         self.var_cname = StringVar()
         self.var_contact = StringVar()
@@ -25,7 +26,7 @@ class BillClass:
         self.var_stock = StringVar()
         self.var_cal_input = StringVar()
 
-        # --- Header Section ---
+        # == Header UI Section ==
         self.header = Frame(self.root, bg="#010c48", bd=0)
         self.header.place(x=0, y=0, relwidth=1, height=70)
 
@@ -45,7 +46,7 @@ class BillClass:
         self.lbl_clock = Label(self.root, text="Welcome to IMS\t\t Date: DD-MM-YYYY\t\t Time: HH:MM:SS", font=("Segoe UI", 11), bg="#34495e", fg="white")
         self.lbl_clock.place(x=0, y=70, relwidth=1, height=30)
 
-        # --- (1) إطار المنتجات ---
+        # == Product Selection Frame (Left Side) ==
         ProductFrame1 = LabelFrame(self.root, text=" 📦 Product Selection ", font=("Segoe UI", 12, "bold"), bd=2, relief=RIDGE, bg="white", fg="#2c3e50")
         ProductFrame1.place(x=10, y=110, width=410, height=585)
 
@@ -55,6 +56,7 @@ class BillClass:
         btn_search = Button(ProductFrame1, text="Search", command=self.search, font=("Segoe UI", 10, "bold"), bg="#3498db", fg="white", cursor="hand2", bd=0).place(x=210, y=10, width=85, height=35)
         btn_show_all = Button(ProductFrame1, text="All", command=self.show, font=("Segoe UI", 10, "bold"), bg="#607d8b", fg="white", cursor="hand2", bd=0).place(x=305, y=10, width=85, height=35)
 
+        # Product Table
         ProductFrame3 = Frame(ProductFrame1, bd=1, relief=SOLID)
         ProductFrame3.place(x=10, y=60, width=385, height=460)
 
@@ -75,7 +77,7 @@ class BillClass:
 
         lbl_note = Label(ProductFrame1, text="* Note: Set Qty to 0 to Remove from Cart", font=("Segoe UI", 9, "italic"), bg="white", fg="red").pack(side=BOTTOM, pady=5)
 
-        # --- (2) إطار العميل ---
+        # == Customer Details Frame (Middle Top) ==
         CustomerFrame = LabelFrame(self.root, text=" 👤 Customer Details ", font=("Segoe UI", 12, "bold"), bd=2, relief=RIDGE, bg="white", fg="#2c3e50")
         CustomerFrame.place(x=430, y=110, width=515, height=90)
         Label(CustomerFrame, text="Name:", font=("Segoe UI", 11), bg="white").place(x=10, y=10)
@@ -83,10 +85,11 @@ class BillClass:
         Label(CustomerFrame, text="Contact:", font=("Segoe UI", 11), bg="white").place(x=240, y=10)
         Entry(CustomerFrame, textvariable=self.var_contact, font=("Segoe UI", 11), bg="#f9f9f9").place(x=310, y=10, width=150)
 
-        # --- (3) الحاسبة وسلة المشتريات ---
+        # == Calculator & Cart Section (Middle) ==
         Cal_Cart_Frame = Frame(self.root, bg="#f4f6f7")
         Cal_Cart_Frame.place(x=430, y=205, width=515, height=360)
 
+        # Calculator UI
         Cal_Frame = Frame(Cal_Cart_Frame, bd=2, relief=RIDGE, bg="white")
         Cal_Frame.place(x=0, y=5, width=268, height=345)
         Entry(Cal_Frame, textvariable=self.var_cal_input, font=("Segoe UI", 20, "bold"), width=15, bd=5, relief=FLAT, bg="#ecf0f1", justify=RIGHT, state='readonly').grid(row=0, columnspan=4, pady=10, padx=5)
@@ -100,6 +103,7 @@ class BillClass:
             c+=1
             if c>3: c=0; r+=1
 
+        # Cart Table UI
         Cart_Frame = Frame(Cal_Cart_Frame, bd=2, relief=RIDGE, bg="white")
         Cart_Frame.place(x=275, y=5, width=240, height=345)
         self.cart_Title = Label(Cart_Frame, text="🛒 Cart Items", font=("Segoe UI", 11, "bold"), bg="#2ecc71", fg="white")
@@ -111,7 +115,7 @@ class BillClass:
         self.Cart_Table.pack(fill=BOTH, expand=1)
         self.Cart_Table.bind("<ButtonRelease-1>", self.get_data_cart)
 
-        # --- (4) إطار التحكم في المنتج ---
+        # == Product Input Control Frame ==
         Add_Cart_WidgetsFrame = Frame(self.root, bd=2, relief=RIDGE, bg="white")
         Add_Cart_WidgetsFrame.place(x=430, y=575, width=515, height=120)
         Label(Add_Cart_WidgetsFrame, text="Product Name", font=("Segoe UI", 10), bg="white").place(x=5, y=5)
@@ -123,10 +127,10 @@ class BillClass:
         self.lbl_in_stock = Label(Add_Cart_WidgetsFrame, text="In Stock: 0", font=("Segoe UI", 10, "bold"), bg="white", fg="#e74c3c")
         self.lbl_in_stock.place(x=5, y=70)
         
-        btn_clear_fields = Button(Add_Cart_WidgetsFrame, text="CLEAR", command=self.clear_cart_fields, font=("Segoe UI", 10, "bold"), bg="#95a5a6", fg="white", cursor="hand2", bd=0).place(x=150, y=70, width=120, height=35)
+        btn_clear_fields = Button(Add_Cart_WidgetsFrame, text="CLEAR", command=self.clear_cart_fields, font=("Segoe UI", 10, "bold"), bg="#95a5a5", fg="white", cursor="hand2", bd=0).place(x=150, y=70, width=120, height=35)
         btn_add_cart = Button(Add_Cart_WidgetsFrame, text="ADD TO CART", command=self.add_update_cart, font=("Segoe UI", 10, "bold"), bg="#f1c40f", fg="black", cursor="hand2", bd=0).place(x=310, y=70, width=180, height=35)
 
-        # --- (5) إطار الفاتورة ---
+        # == Invoice Billing Area (Right Side) ==
         BillFrame = LabelFrame(self.root, text=" 🧾 Invoice Details ", font=("Segoe UI", 12, "bold"), bd=2, bg="white", fg="#2c3e50")
         BillFrame.place(x=955, y=110, width=400, height=415)
         scrolly_t = Scrollbar(BillFrame, orient=VERTICAL)
@@ -135,16 +139,14 @@ class BillClass:
         self.txt_bill_area.pack(fill=BOTH, expand=1)
         scrolly_t.config(command=self.txt_bill_area.yview)
 
+        # Billing Menu
         BillMenuFrame = Frame(self.root, bd=0, bg="#f4f6f7")
         BillMenuFrame.place(x=955, y=530, width=380, height=165)
         
         self.lbl_amnt = Label(BillMenuFrame, text="Bill Amount\n0.00", font=("Segoe UI", 12, "bold"), bg="#3498db", fg="white", bd=1, relief=SOLID)
         self.lbl_amnt.place(x=0, y=5, width=120, height=60)
-        
-        # التعديل المطلوب: تم تغيير العنوان ليعرض قيمة الخصم الفعلية
         self.lbl_discount = Label(BillMenuFrame, text="Discount 5%\n0.00", font=("Segoe UI", 12, "bold"), bg="#2ecc71", fg="white", bd=1, relief=SOLID)
         self.lbl_discount.place(x=125, y=5, width=120, height=60)
-        
         self.lbl_net_pay = Label(BillMenuFrame, text="Net Pay\n0.00", font=("Segoe UI", 12, "bold"), bg="#e74c3c", fg="white", bd=1, relief=SOLID)
         self.lbl_net_pay.place(x=250, y=5, width=125, height=60)
         
@@ -155,20 +157,22 @@ class BillClass:
         self.show()
         self.update_date_time()
 
-# ================= الوظائف (Functions) =================
-
+    # == Function: Database Connection ==
     def get_connection(self):
         return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
 
+    # == Function: Logout ==
     def logout(self):
         if messagebox.askyesno("Confirm", "Do you really want to Logout?", parent=self.root): self.root.destroy()
 
+    # == Function: Real-time Clock Update ==
     def update_date_time(self):
         time_ = time.strftime("%I:%M:%S")
         date_ = time.strftime("%d-%m-%Y")
         self.lbl_clock.config(text=f"Welcome to IMS\t\t Date: {date_}\t\t Time: {time_}")
         self.lbl_clock.after(200, self.update_date_time)
 
+    # == Function: Show Products in Table ==
     def show(self):
         con = self.get_connection(); cur = con.cursor()
         try:
@@ -179,6 +183,7 @@ class BillClass:
         except Exception as ex: messagebox.showerror("Error", str(ex), parent=self.root)
         finally: con.close()
 
+    # == Function: Search Products ==
     def search(self):
         con = self.get_connection(); cur = con.cursor()
         try:
@@ -191,6 +196,7 @@ class BillClass:
         except Exception as ex: messagebox.showerror("Error", str(ex), parent=self.root)
         finally: con.close()
 
+    # == Function: Fetch Product Selection Data ==
     def get_data(self, ev):
         f = self.product_Table.focus(); content = (self.product_Table.item(f)); row = content['values']
         self.var_pid.set(row[0]); self.var_pname.set(row[1])
@@ -198,10 +204,12 @@ class BillClass:
         self.var_price.set(price_val)
         self.lbl_in_stock.config(text=f"In Stock [{row[3]}]"); self.var_stock.set(row[3]); self.var_qty.set('1')
 
+    # == Function: Fetch Cart Selection Data ==
     def get_data_cart(self, ev):
         f = self.Cart_Table.focus(); content = (self.Cart_Table.item(f)); row = content['values']
         self.var_pid.set(row[0]); self.var_pname.set(row[1]); self.var_price.set(row[2]); self.var_qty.set(row[3])
 
+    # == Function: Add or Update Items in Cart ==
     def add_update_cart(self):
         if self.var_pid.get() == '': messagebox.showerror('Error', "Select product", parent=self.root)
         elif self.var_qty.get() == '': messagebox.showerror('Error', "Quantity required", parent=self.root)
@@ -221,42 +229,59 @@ class BillClass:
             else: self.cart_list.append(cart_data)
             self.show_cart(); self.bill_updates()
 
+    # == Function: Update Bill Calculations UI ==
     def bill_updates(self):
-        # حساب إجمالي الفاتورة
         self.bill_amnt = sum(float(row[2]) for row in self.cart_list)
-        # حساب قيمة الخصم (مثلاً 5%)
         self.discount_val = (self.bill_amnt * 5) / 100
-        # حساب المبلغ الصافي بعد الخصم
         self.net_pay = self.bill_amnt - self.discount_val
-        
         self.lbl_amnt.config(text=f"Bill Amnt\n{str(self.bill_amnt)}")
-        # هنا التعديل: إظهار مبلغ الخصم الفعلي
-        self.lbl_discount.config(text=f"Discount\n{str(self.discount_val)}")
+        self.lbl_discount.config(text=f"Discount 5%\n{str(self.discount_val)}")
         self.lbl_net_pay.config(text=f"Net Pay\n{str(self.net_pay)}")
         self.cart_Title.config(text=f"🛒 {str(len(self.cart_list))} Items in Cart")
 
+    # == Function: Refresh Cart View ==
     def show_cart(self):
         self.Cart_Table.delete(*self.Cart_Table.get_children())
         for row in self.cart_list: self.Cart_Table.insert('', END, values=row)
 
+    # == Function: Generate and Prepare Bill Data ==
     def generate_bill(self):
         if self.var_cname.get() == '' or self.var_contact.get() == '': messagebox.showerror("Error", "Customer details required")
         elif len(self.cart_list) == 0: messagebox.showerror("Error", "Cart is empty")
         else:
             self.bill_no = str(int(time.strftime("%H%M%S")) + int(time.strftime("%d%m%Y")))
+            self.bill_date = time.strftime('%d/%m/%Y')
             self.txt_bill_area.delete('1.0', END)
-            self.txt_bill_area.insert('1.0', "\t\tInventory System\n\tPhone No. 0123456789, Cairo\n" + "="*47 + f"\n Customer: {self.var_cname.get()}\n Ph No. :{self.var_contact.get()}\n Bill No. {self.bill_no}\t\tDate: {time.strftime('%d/%m/%Y')}\n" + "="*47 + "\n Product Name\t\t\tQty\tPrice\n" + "="*47 + "\n")
+            self.txt_bill_area.insert('1.0', "\t\tInventory System\n\tPhone No. 0123456789, Cairo\n" + "="*47 + f"\n Customer: {self.var_cname.get()}\n Ph No. :{self.var_contact.get()}\n Bill No. {self.bill_no}\t\tDate: {self.bill_date}\n" + "="*47 + "\n Product Name\t\t\tQty\tPrice\n" + "="*47 + "\n")
             for row in self.cart_list: self.txt_bill_area.insert(END, f" {row[1]}\t\t\t{row[3]}\tLE.{row[2]}\n")
-            # التعديل في الفاتورة المكتوبة أيضاً
             self.txt_bill_area.insert(END, "="*47 + f"\n Amount\t\t\t\tLE.{self.bill_amnt}\n Discount\t\t\t\tLE.{self.discount_val}\n Net Pay\t\t\t\tLE.{self.net_pay}\n" + "="*47 + "\n")
             self.save_bill()
 
+    # == Function: Save Bill to File and SQL Database ==
     def save_bill(self):
-        if not os.path.exists('bill'): os.mkdir('bill')
-        with open(f'bill/{str(self.bill_no)}.txt', 'w') as f: f.write(self.txt_bill_area.get('1.0', END))
-        messagebox.showinfo("Saved", "Bill generated & saved")
-        self.update_stock()
+        con = self.get_connection(); cur = con.cursor()
+        try:
+            # Insert into SQL Server Database
+            cur.execute("""
+                INSERT INTO billing (bill_no, bill_date, customer_name, customer_contact, total_amount, discount_val, net_pay)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                self.bill_no, self.bill_date, self.var_cname.get(), self.var_contact.get(),
+                float(self.bill_amnt), float(self.discount_val), float(self.net_pay)
+            ))
+            con.commit()
 
+            # Save Text File
+            if not os.path.exists('bill'): os.mkdir('bill')
+            with open(f'bill/{str(self.bill_no)}.txt', 'w') as f: f.write(self.txt_bill_area.get('1.0', END))
+            
+            messagebox.showinfo("Saved", "Bill generated & saved to SQL Database")
+            self.update_stock()
+            self.clear_all() # Reset after successful save
+        except Exception as ex: messagebox.showerror("Error", f"Save Error: {str(ex)}")
+        finally: con.close()
+
+    # == Function: Update Product Stock in Database ==
     def update_stock(self):
         con = self.get_connection(); cur = con.cursor()
         try:
@@ -269,6 +294,7 @@ class BillClass:
         except Exception as ex: messagebox.showerror("Error", str(ex))
         finally: con.close()
 
+    # == Function: Print Bill File ==
     def print_bill(self):
         if self.txt_bill_area.get('1.0', END).strip() == "": messagebox.showerror("Error", "Generate bill first")
         else:
@@ -276,16 +302,19 @@ class BillClass:
             with open(file_, 'w') as f: f.write(self.txt_bill_area.get('1.0', END))
             os.startfile(file_, 'print')
 
+    # == Function: Clear Product Input Fields ==
     def clear_cart_fields(self):
         self.var_pid.set(""); self.var_pname.set(""); self.var_price.set(""); self.var_qty.set("")
         self.lbl_in_stock.config(text="In Stock: 0"); self.var_stock.set("")
 
+    # == Function: Complete Reset of Billing UI ==
     def clear_all(self):
         del self.cart_list[:]
         self.var_cname.set(""); self.var_contact.set(""); self.var_search.set("")
         self.txt_bill_area.delete('1.0', END); self.cart_Title.config(text="🛒 Items in Cart")
         self.clear_cart_fields(); self.show(); self.show_cart(); self.bill_updates()
 
+    # == Calculator Logic ==
     def get_input(self, num): self.var_cal_input.set(self.var_cal_input.get() + str(num))
     def clear_cal(self): self.var_cal_input.set("")
     def perform_cal(self):

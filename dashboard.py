@@ -1,270 +1,255 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import Image, ImageTk 
-from employee import employeeClass
-import pyodbc
-from supplier import supplierClass
-from category import categoryClass
-from product import productClass
-from sales import salesClass
 import time
 import os
 import sys
 
+# == System Modules & Database Connection ==
+# Added billingClass to the imports
+try:
+    from employee import employeeClass
+    from supplier import supplierClass
+    from category import categoryClass
+    from product import productClass
+    from sales import salesClass
+    from billing import BillClass # Import the billing module you provided
+    import pyodbc
+except ImportError as e:
+    print(f"Error: Module missing -> {e}")
+
 class IMS:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1425x750+0+0")
-        self.root.title("Inventory Management System")
+        self.root.geometry("1425x850+0+0")
+        self.root.title("Inventory Management System | Pro Dashboard")
         
-        # استلام الصلاحيات
+        # == System State ==
         self.user_role = sys.argv[1] if len(sys.argv) > 1 else "Admin"
-
         self.is_dark_mode = False
+        self.windows = {"emp": None, "sup": None, "cat": None, "prd": None, "sal": None, "bill": None}
+
+        # == Professional Color Palette ==
         self.themes = {
             "light": {
-                "bg": "#F4F7F6",
-                "header": "#2C3E50",
-                "menu_bg": "#FFFFFF",
-                "menu_text": "#2F3640",
-                "card_bg": "#3498DB",
-                "text": "black",
-                "clock_bg": "#34495E"
+                "bg": "#F8FAFC", 
+                "sidebar": "#0F172A", 
+                "header": "#FFFFFF", 
+                "text": "#1E293B", 
+                "card_bg": "#FFFFFF", 
+                "sub_text": "#64748B",
+                "info": "#E2E8F0"
             },
             "dark": {
-                "bg": "#1E1E1E",
-                "header": "#000000",
-                "menu_bg": "#2D2D2D",
-                "menu_text": "#ECF0F1",
-                "card_bg": "#34495E",
-                "text": "white",
-                "clock_bg": "#121212"
+                "bg": "#0B0F19",       
+                "sidebar": "#161B2E",  
+                "header": "#161B2E",   
+                "text": "#F8FAFC",     
+                "card_bg": "#1E293B",  
+                "sub_text": "#94A3B8", 
+                "info": "#2D3748"      
             }
         }
+        
+        self.active_theme = self.themes["light"]
+        self.root.config(bg=self.active_theme["bg"])
 
-        self.primary_color = self.themes["light"]["header"]
-        self.secondary_color = "#1ABC9C" 
-        self.logout_color = "#E74C3C"
+        # == Sidebar Section ==
+        self.sidebar = Frame(self.root, bg=self.active_theme["sidebar"], bd=0)
+        self.sidebar.pack(side=LEFT, fill=Y)
+        self.sidebar.config(width=260)
+        self.sidebar.pack_propagate(False)
 
-        self.root.config(bg=self.themes["light"]["bg"])
+        # Brand Identity
+        self.brand_frame = Frame(self.sidebar, bg=self.active_theme["sidebar"])
+        self.brand_frame.pack(side=TOP, fill=X, pady=40)
+        self.lbl_logo = Label(self.brand_frame, text="IMS", font=("Impact", 34), bg=self.active_theme["sidebar"], fg="#3B82F6")
+        self.lbl_logo.pack()
+        self.lbl_subtitle = Label(self.brand_frame, text="PRO MANAGEMENT", font=("Segoe UI", 9, "bold"), bg=self.active_theme["sidebar"], fg="#64748B")
+        self.lbl_subtitle.pack()
 
-        # Window tracking to prevent multiple windows
-        self.employee_win = None
-        self.supplier_win = None
-        self.category_win = None
-        self.product_win = None
-        self.sales_win = None
+        # == Side Navigation Menu (Dashboard removed) ==
+        self.nav_btns = []
+        self.btn_emp = self.create_nav_btn("Employees", "👥", self.employee)
+        self.btn_sup = self.create_nav_btn("Suppliers", "🚚", self.supplier)
+        self.create_nav_btn("Categories", "📂", self.category)
+        self.create_nav_btn("Products", "📦", self.product)
+        self.create_nav_btn("Sales Records", "📊", self.sales)
+        
+        # Added Billing button below Sales Records
+        self.create_nav_btn("Billing System", "🧾", self.billing)
+        
+        self.create_nav_btn("Exit", "🚪", self.root.quit, side=BOTTOM)
 
-        # == Header ==
-        self.header = Frame(self.root, bg=self.primary_color, bd=0)
-        self.header.place(x=0, y=0, relwidth=1, height=70)
+        # == Top Header Bar ==
+        self.header = Frame(self.root, bg=self.active_theme["header"], bd=0)
+        self.header.pack(side=TOP, fill=X)
+        self.lbl_panel_title = Label(self.header, text="Control Center", font=("Segoe UI", 20, "bold"), bg=self.active_theme["header"], fg=self.active_theme["text"])
+        self.lbl_panel_title.pack(side=LEFT, padx=30, pady=20)
+        
+        # Logout & Theme Switcher
+        btn_logout = Button(self.header, text="Logout", font=("Segoe UI", 10, "bold"), bg="#EF4444", fg="white", bd=0, cursor="hand2", padx=20, pady=8, command=self.logout)
+        btn_logout.pack(side=RIGHT, padx=30)
+        
+        self.btn_theme_toggle = Button(self.header, text="🌙 Dark Mode", font=("Segoe UI", 10, "bold"), bg="#10B981", fg="white", bd=0, cursor="hand2", padx=15, command=self.toggle_ui_theme)
+        self.btn_theme_toggle.pack(side=RIGHT)
 
-        try:
-            img = Image.open("images/logo1.png")
-            img = img.resize((45, 45), Image.LANCZOS)
-            self.icon_title = ImageTk.PhotoImage(img)
-        except:
-            self.icon_title = None
+        # == Status Bar (Clock & User Role) ==
+        self.status_frame = Frame(self.root, bg=self.active_theme["info"])
+        self.status_frame.pack(side=TOP, fill=X)
+        self.lbl_clock = Label(self.status_frame, text="", font=("Segoe UI", 10), bg=self.active_theme["info"], fg="#64748B")
+        self.lbl_clock.pack(side=LEFT, padx=30, pady=5)
+        self.lbl_role_display = Label(self.status_frame, text=f"Role: {self.user_role}", font=("Segoe UI", 10, "bold"), bg=self.active_theme["info"], fg="#3B82F6")
+        self.lbl_role_display.pack(side=RIGHT, padx=30)
 
-        self.title = Label(
-            self.header,
-            text="Inventory Management System",
-            image=self.icon_title,
-            compound="left",
-            font=("Segoe UI", 30, "bold"),
-            bg=self.primary_color,
-            fg="white",
-            anchor="w",
-            padx=20
-        )
-        self.title.pack(side=LEFT, fill=Y)
+        # == Main Dashboard View ==
+        self.main_container = Frame(self.root, bg=self.active_theme["bg"])
+        self.main_container.pack(fill=BOTH, expand=True, padx=20, pady=20)
 
-        # == Header Buttons ==
-        btn_logout = Button(self.header, text="Logout", font=("Segoe UI", 12, "bold"), bg=self.logout_color, fg="white", cursor="hand2", bd=0, padx=15, pady=5, command=self.logout)
-        btn_logout.pack(side=RIGHT, padx=20, pady=15)
+        # == Card Data Objects ==
+        self.card_elements = [] 
+        self.stat_values = {}   
+        
+        cards_config = [
+            ("Total Employees", "emp", "#3B82F6", 0, 0, self.employee),
+            ("Total Suppliers", "sup", "#8B5CF6", 0, 1, self.supplier),
+            ("Total Categories", "cat", "#EC4899", 0, 2, self.category),
+            ("Total Products", "prd", "#10B981", 1, 0, self.product),
+            ("Total Sales", "sal", "#F59E0B", 1, 1, self.sales)
+        ]
 
-        self.btn_theme = Button(self.header, text="🌙 Dark Mode", font=("Segoe UI", 10, "bold"), bg="#F1C40F", fg="black", cursor="hand2", bd=0, padx=10, command=self.toggle_theme)
-        self.btn_theme.pack(side=RIGHT, padx=5, pady=15)
-
-        # == Clock ==
-        self.lbl_clock = Label(self.root, text="Welcome to IMS\t\t Date: DD-MM-YYYY\t\t Time: HH:MM:SS", font=("Segoe UI", 11), bg=self.themes["light"]["clock_bg"], fg="white")
-        self.lbl_clock.place(x=0, y=70, relwidth=1, height=30)
-
-        # == Left Menu ==
-        self.LeftMenu = Frame(self.root, bd=0, bg=self.themes["light"]["menu_bg"], highlightthickness=1, highlightbackground="#DCDDE1")
-        self.LeftMenu.place(x=0, y=100, width=220, relheight=1)
-
-        try:
-            self.MenuLogo = Image.open("images/menu_im.png")
-            self.MenuLogo = self.MenuLogo.resize((180, 180), Image.LANCZOS)
-            self.MenuLogo = ImageTk.PhotoImage(self.MenuLogo)
-            self.lbl_menuLogo = Label(self.LeftMenu, image=self.MenuLogo, bg=self.themes["light"]["menu_bg"])
-            self.lbl_menuLogo.pack(side=TOP, pady=10)
-        except:
-            self.lbl_menuLogo = Label(self.LeftMenu, bg=self.themes["light"]["menu_bg"])
-            self.lbl_menuLogo.pack(side=TOP, pady=10)
-
-        self.lbl_menu_title = Label(self.LeftMenu, text="MAIN MENU", font=("Segoe UI", 15, "bold"), bg=self.secondary_color, fg="white")
-        self.lbl_menu_title.pack(side=TOP, fill=X, pady=(0, 10))
-
-        # == Menu Buttons ==
-        self.menu_btns = []
-        self.btn_employee = Button(self.LeftMenu, text="  Employee", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.employee)
-        self.btn_employee.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_employee)
-
-        self.btn_supplier = Button(self.LeftMenu, text="  Supplier", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.supplier)
-        self.btn_supplier.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_supplier)
-
-        self.btn_category = Button(self.LeftMenu, text="  Category", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.category)
-        self.btn_category.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_category)
-
-        self.btn_product = Button(self.LeftMenu, text="  Products", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.product)
-        self.btn_product.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_product)
-
-        self.btn_sales = Button(self.LeftMenu, text="  Sales", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.sales)
-        self.btn_sales.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_sales)
-
-        self.btn_exit = Button(self.LeftMenu, text="  Exit", anchor="w", font=("Segoe UI", 14), bg=self.themes["light"]["menu_bg"], fg=self.themes["light"]["menu_text"], bd=0, cursor="hand2", pady=10, command=self.root.quit)
-        self.btn_exit.pack(side=TOP, fill=X); self.menu_btns.append(self.btn_exit)
-
-        if self.user_role == "Employee":
-            self.btn_employee.config(state="disabled")
-            self.btn_supplier.config(state="disabled")
-
-        # == Main Content ==
-        self.Main_Frame = Frame(self.root, bg=self.themes["light"]["bg"])
-        self.Main_Frame.place(x=230, y=120, relwidth=0.8, relheight=0.7)
-
-        card_font = ("Segoe UI", 18, "bold")
-        self.lbl_employee = Label(self.Main_Frame, text="Total Employee\n[ 0 ]", bd=0, bg="#3498DB", fg="white", font=card_font, cursor="hand2")
-        self.lbl_employee.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
-        self.lbl_employee.bind("<Button-1>", lambda e: self.employee() if self.user_role == "Admin" else None)
-
-        self.lbl_supplier = Label(self.Main_Frame, text="Total Supplier\n[ 0 ]", bd=0, bg="#9B59B6", fg="white", font=card_font, cursor="hand2")
-        self.lbl_supplier.grid(row=0, column=1, padx=15, pady=15, sticky="nsew")
-        self.lbl_supplier.bind("<Button-1>", lambda e: self.supplier() if self.user_role == "Admin" else None)
-
-        self.lbl_category = Label(self.Main_Frame, text="Total Category\n[ 0 ]", bd=0, bg="#E67E22", fg="white", font=card_font, cursor="hand2")
-        self.lbl_category.grid(row=0, column=2, padx=15, pady=15, sticky="nsew")
-        self.lbl_category.bind("<Button-1>", lambda e: self.category())
-
-        self.lbl_product = Label(self.Main_Frame, text="Total Product\n[ 0 ]", bd=0, bg="#2ECC71", fg="white", font=card_font, cursor="hand2")
-        self.lbl_product.grid(row=1, column=0, padx=15, pady=15, sticky="nsew")
-        self.lbl_product.bind("<Button-1>", lambda e: self.product())
-
-        self.lbl_sales = Label(self.Main_Frame, text="Total Sales\n[ 0 ]", bd=0, bg="#F1C40F", fg="white", font=card_font, cursor="hand2")
-        self.lbl_sales.grid(row=1, column=1, padx=15, pady=15, sticky="nsew")
-        self.lbl_sales.bind("<Button-1>", lambda e: self.sales())
-
-        self.Main_Frame.columnconfigure((0, 1, 2), weight=1)
-        self.Main_Frame.rowconfigure((0, 1), weight=1)
+        for title, key, clr, r, c, cmd in cards_config:
+            labels = self.create_modern_card(self.main_container, title, clr, r, c, cmd)
+            self.stat_values[key] = labels[0] 
+            self.card_elements.append(labels) 
 
         # == Footer ==
-        self.lbl_footer = Label(
-            self.root,
-            text="IMS-Inventory Management System | Developed By\nAhmed Elsayed & Gamal Esam & Shanouda Romany & Youssef Songor",
-            font=("Segoe UI", 10), bg=self.primary_color, fg="white", height=2, pady=5
-        )
-        self.lbl_footer.pack(side=BOTTOM, fill=X)
+        self.footer = Frame(self.root, bg=self.active_theme["sidebar"], height=35)
+        self.footer.pack(side=BOTTOM, fill=X)
+        self.lbl_footer = Label(self.footer, text="IMS-Inventory Management System | Developed By\nAhmed Elsayed & Gamal Esam & Shanouda Romany & Youssef Songor", font=("Segoe UI", 9), bg=self.active_theme["sidebar"], fg="white")
+        self.lbl_footer.pack(expand=True)
 
-        self.lbl_user_display = Label(
-            self.lbl_footer, text="User: " + self.user_role,
-            font=("Segoe UI", 10, "bold"), bg=self.primary_color, fg="#1ABC9C"
-        )
-        self.lbl_user_display.place(relx=0.98, rely=0.5, anchor="e")
+        # == Security: Initial Permission Lock ==
+        if self.user_role == "Employee":
+            self.btn_emp.config(state="disabled")
+            self.btn_sup.config(state="disabled")
 
+        self.update_live_clock()
         self.update_content()
-        self.update_date_time()
 
-    # ================== Functions ==================
-    def get_connection(self):
+    # == UI Component: Modern Sidebar Button ==
+    def create_nav_btn(self, text, icon, command, side=TOP):
+        btn = Button(self.sidebar, text=f"  {icon}  {text}", font=("Segoe UI", 11), bg=self.active_theme["sidebar"], fg="#94A3B8", bd=0, cursor="hand2", anchor="w", padx=30, pady=15, activebackground="#1E293B", activeforeground="white", command=command)
+        btn.pack(side=side, fill=X)
+        btn.bind("<Enter>", lambda e: btn.config(fg="white", bg="#1E293B") if str(btn['state']) == 'normal' else None)
+        btn.bind("<Leave>", lambda e: btn.config(fg="#94A3B8", bg=self.sidebar['bg']) if str(btn['state']) == 'normal' else None)
+        self.nav_btns.append(btn)
+        return btn
+
+    # == UI Component: Interactive Responsive Card ==
+    def create_modern_card(self, master, title, clr, r, c, cmd):
+        f = Frame(master, bg=self.active_theme["card_bg"], bd=0, highlightthickness=1, highlightbackground=self.active_theme["info"], cursor="hand2")
+        f.grid(row=r, column=c, padx=15, pady=15, sticky="nsew")
+        
+        strip = Frame(f, bg=clr, height=4)
+        strip.pack(side=TOP, fill=X)
+        
+        cnt = Frame(f, bg=self.active_theme["card_bg"], padx=25, pady=25)
+        cnt.pack(fill=BOTH, expand=True)
+        
+        t_lbl = Label(cnt, text=title, font=("Segoe UI", 11, "bold"), bg=self.active_theme["card_bg"], fg=self.active_theme["sub_text"])
+        t_lbl.pack(anchor="w")
+        v_lbl = Label(cnt, text="0", font=("Segoe UI", 32, "bold"), bg=self.active_theme["card_bg"], fg=self.active_theme["text"])
+        v_lbl.pack(anchor="w", pady=10)
+
+        def handle_click(e):
+            if self.user_role == "Employee" and title in ["Total Employees", "Total Suppliers"]:
+                messagebox.showwarning("Access Denied", "Your account does not have permission to view this module.")
+            else: cmd()
+
+        for widget in [f, cnt, v_lbl]:
+            widget.bind("<Button-1>", handle_click)
+            widget.bind("<Enter>", lambda e: f.config(highlightbackground=clr, highlightthickness=2))
+            widget.bind("<Leave>", lambda e: f.config(highlightbackground=self.active_theme["info"], highlightthickness=1))
+
+        master.columnconfigure(c, weight=1)
+        master.rowconfigure(r, weight=1)
+        return (v_lbl, f, t_lbl, cnt) 
+
+    # == Theme Engine: Dark/Light Mode Switching ==
+    def toggle_ui_theme(self):
+        self.is_dark_mode = not self.is_dark_mode
+        self.active_theme = self.themes["dark"] if self.is_dark_mode else self.themes["light"]
+        
+        self.root.config(bg=self.active_theme["bg"])
+        self.sidebar.config(bg=self.active_theme["sidebar"])
+        self.brand_frame.config(bg=self.active_theme["sidebar"])
+        self.lbl_logo.config(bg=self.active_theme["sidebar"])
+        self.lbl_subtitle.config(bg=self.active_theme["sidebar"])
+        self.header.config(bg=self.active_theme["header"])
+        self.lbl_panel_title.config(bg=self.active_theme["header"], fg=self.active_theme["text"])
+        self.status_frame.config(bg=self.active_theme["info"])
+        self.lbl_clock.config(bg=self.active_theme["info"])
+        self.lbl_role_display.config(bg=self.active_theme["info"])
+        self.main_container.config(bg=self.active_theme["bg"])
+        self.footer.config(bg=self.active_theme["sidebar"])
+        self.lbl_footer.config(bg=self.active_theme["sidebar"])
+
+        for btn in self.nav_btns:
+            btn.config(bg=self.active_theme["sidebar"])
+        
+        for v_lbl, f, t_lbl, cnt in self.card_elements:
+            f.config(bg=self.active_theme["card_bg"], highlightbackground=self.active_theme["info"])
+            cnt.config(bg=self.active_theme["card_bg"])
+            t_lbl.config(bg=self.active_theme["card_bg"], fg=self.active_theme["sub_text"])
+            v_lbl.config(bg=self.active_theme["card_bg"], fg=self.active_theme["text"])
+        
+        self.btn_theme_toggle.config(
+            text="☀️ Light Mode" if self.is_dark_mode else "🌙 Dark Mode",
+            bg="#3B82F6" if self.is_dark_mode else "#10B981"
+        )
+
+    # == Backend Logic ==
+    def get_db_con(self):
         return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
 
-    def update_date_time(self):
-        time_ = time.strftime("%I:%M:%S")
-        date_ = time.strftime("%d-%m-%Y")
-        self.lbl_clock.config(text=f"Welcome {self.user_role} to IMS\t\t Date: {date_}\t\t Time: {time_}")
-        self.lbl_clock.after(200, self.update_date_time)
-
     def update_content(self):
-        con = self.get_connection(); cur = con.cursor()
         try:
-            cur.execute("select * from product"); self.lbl_product.config(text=f"Total Product\n[ {str(len(cur.fetchall()))} ]")
-            cur.execute("select * from supplier"); self.lbl_supplier.config(text=f"Total Supplier\n[ {str(len(cur.fetchall()))} ]")
-            cur.execute("select * from category"); self.lbl_category.config(text=f"Total Category\n[ {str(len(cur.fetchall()))} ]")
-            cur.execute("select * from employee"); self.lbl_employee.config(text=f"Total Employee\n[ {str(len(cur.fetchall()))} ]")
-            bill_count = len(os.listdir('bill')) if os.path.exists('bill') else 0
-            self.lbl_sales.config(text=f"Total Sales\n[ {str(bill_count)} ]")
-        except Exception as ex: messagebox.showerror("Error", str(ex))
-        finally: con.close()
+            con = self.get_db_con(); cur = con.cursor()
+            cur.execute("select * from product"); self.stat_values["prd"].config(text=str(len(cur.fetchall())))
+            cur.execute("select * from supplier"); self.stat_values["sup"].config(text=str(len(cur.fetchall())))
+            cur.execute("select * from category"); self.stat_values["cat"].config(text=str(len(cur.fetchall())))
+            cur.execute("select * from employee"); self.stat_values["emp"].config(text=str(len(cur.fetchall())))
+            sales = len(os.listdir('bill')) if os.path.exists('bill') else 0
+            self.stat_values["sal"].config(text=str(sales))
+            con.close()
+        except: pass
+
+    def update_live_clock(self):
+        self.lbl_clock.config(text=time.strftime("📅 %d-%m-%Y  |  ⏰ %I:%M:%S %p"))
+        self.lbl_clock.after(1000, self.update_live_clock)
 
     def logout(self):
-        if messagebox.askyesno("Confirm", "Do you really want to logout?"):
+        if messagebox.askyesno("Exit", "Are you sure you want to logout?"):
             self.root.destroy()
-            # Reopen login window
-            import login as login_module
-            from tkinter import Tk
-            login_root = Tk()
-            login_module.Login_System(login_root)
-            login_root.mainloop()
+            os.system("python login.py")
 
-    def toggle_theme(self):
-        self.is_dark_mode = not self.is_dark_mode
-        theme = self.themes["dark"] if self.is_dark_mode else self.themes["light"]
-        self.root.config(bg=theme["bg"])
-        self.header.config(bg=theme["header"])
-        self.title.config(bg=theme["header"])
-        self.lbl_clock.config(bg=theme["clock_bg"])
-        self.lbl_footer.config(bg=theme["header"])
-        self.Main_Frame.config(bg=theme["bg"])
-        self.LeftMenu.config(bg=theme["menu_bg"])
-        self.lbl_menuLogo.config(bg=theme["menu_bg"])
-        
-        # أهم جزء: تحديث خلفية الـ User Admin عشان متختفيش
-        self.lbl_user_display.config(bg=theme["header"])
-        
-        for btn in self.menu_btns:
-            btn.config(bg=theme["menu_bg"], fg=theme["menu_text"])
-        
-        if self.is_dark_mode: self.btn_theme.config(text="☀️ Light Mode", bg="#ECF0F1", fg="black")
-        else: self.btn_theme.config(text="🌙 Dark Mode", bg="#F1C40F", fg="black")
+    # == Window Navigation Functions ==
+    def employee(self): self.open_sub_window("emp", employeeClass)
+    def supplier(self): self.open_sub_window("sup", supplierClass)
+    def category(self): self.open_sub_window("cat", categoryClass)
+    def product(self): self.open_sub_window("prd", productClass)
+    def sales(self): self.open_sub_window("sal", salesClass)
+    def billing(self): self.open_sub_window("bill", BillClass) # Function to open the Billing window
 
-    def employee(self):
-        if self.employee_win is None or not self.employee_win.winfo_exists():
-            self.employee_win = Toplevel(self.root)
-            self.new_obj = employeeClass(self.employee_win)
-        else:
-            self.employee_win.focus()
-
-    def supplier(self):
-        if self.supplier_win is None or not self.supplier_win.winfo_exists():
-            self.supplier_win = Toplevel(self.root)
-            self.new_obj = supplierClass(self.supplier_win)
-        else:
-            self.supplier_win.focus()
-
-    def category(self):
-        if self.category_win is None or not self.category_win.winfo_exists():
-            self.category_win = Toplevel(self.root)
-            self.new_obj = categoryClass(self.category_win)
-        else:
-            self.category_win.focus()
-
-    def product(self):
-        if self.product_win is None or not self.product_win.winfo_exists():
-            self.product_win = Toplevel(self.root)
-            self.new_obj = productClass(self.product_win)
-        else:
-            self.product_win.focus()
-
-    def sales(self):
-        if self.sales_win is None or not self.sales_win.winfo_exists():
-            self.sales_win = Toplevel(self.root)
-            self.new_obj = salesClass(self.sales_win)
-        else:
-            self.sales_win.focus()
+    # == Helper: Sub-window Controller ==
+    def open_sub_window(self, key, cls):
+        if self.windows[key] is None or not self.windows[key].winfo_exists():
+            self.windows[key] = Toplevel(self.root)
+            cls(self.windows[key])
+        else: self.windows[key].focus()
 
 if __name__ == "__main__":
-    from tkinter import messagebox
     root = Tk()
-    obj = IMS(root)
+    IMS(root)
     root.mainloop()
