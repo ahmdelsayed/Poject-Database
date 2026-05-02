@@ -17,7 +17,6 @@ class Login_System:
 
         self.otp=''
 
-        # المتغيرات
         self.employee_id = StringVar()
         self.password = StringVar()
         self.var_otp = StringVar() 
@@ -44,7 +43,6 @@ class Login_System:
         Button(login_frame, text="Forget Password?", command=self.forget_window, font=("Segoe UI", 10), bg="#111827", fg="#60a5fa", bd=0, cursor="hand2", activebackground="#111827", activeforeground="#2563eb").pack()
 
     def get_connection(self):
-        # تأكد من أن SERVER مطابق لاسم جهازك
         return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
 
     def login(self):
