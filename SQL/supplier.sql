@@ -5,5 +5,4 @@ CREATE TABLE supplier (
     desc_info NVARCHAR(MAX) 
 );
 
-SELECT * FROM supplier
 
