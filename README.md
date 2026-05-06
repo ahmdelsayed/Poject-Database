@@ -70,7 +70,7 @@ The UML diagram describes:
 
 ### 🎭 Use Case Diagram
 
-![Use Case](digram/use case.drawio.png)
+![Use Case](https://github.com/ahmdelsayed/Poject-Database/blob/main/digram/use%20case.drawio.png?raw=true)
 
 This diagram explains:
 
