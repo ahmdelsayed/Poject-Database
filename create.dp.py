@@ -4,14 +4,14 @@ def create_db():
    
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=AMD\\SQLEXPRESS;'  
+        'SERVER=***\\SQLEXPRESS;'  
         'DATABASE=master;'         
         'Trusted_Connection=yes;'
         'TrustServerCertificate=yes;'
     )
     
     try:
-        # connect server SQL AMD
+        # connect server SQL 
         con = pyodbc.connect(connection_string, autocommit=True)
         cur = con.cursor()
         
