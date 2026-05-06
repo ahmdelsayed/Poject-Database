@@ -211,7 +211,7 @@ class IMS:
 
     # == Backend Logic ==
     def get_db_con(self):
-        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=***\\SQLEXPRESS;DATABASE=***;Trusted_Connection=yes;')
 
     def update_content(self):
         try:
