@@ -44,7 +44,7 @@ class Login_System:
         Button(login_frame, text="Forget Password?", command=self.forget_window, font=("Segoe UI", 10), bg="#111827", fg="#60a5fa", bd=0, cursor="hand2", activebackground="#111827", activeforeground="#2563eb").pack()
 
     def get_connection(self):
-        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=***\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;')
 
     def login(self):
         con = self.get_connection()
