@@ -123,7 +123,7 @@ class productClass:
 # ================= الوظائف (Functions) =================
 
     def get_connection(self):
-        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=***\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
 
     def fetch_cat_sup(self):
         self.cat_list.append("Empty")
