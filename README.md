@@ -170,7 +170,7 @@ This screen allows users to log in using:
 
 📧 Email input field with validation:
 
-![Email Field](screenshots_project/reset_password_otp.png)
+![Reset Password OTP](screenshots_project/reset_password_otp.png)
 
 ---
 
