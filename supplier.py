@@ -102,7 +102,7 @@ class supplierClass:
 # ================= (Functions) =================
 
     def get_connection(self):
-        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=AMD\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
+        return pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=***\\SQLEXPRESS;DATABASE=ims;Trusted_Connection=yes;TrustServerCertificate=yes;')
 
     def add(self):
         con = self.get_connection()
