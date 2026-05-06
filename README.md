@@ -159,18 +159,18 @@ This diagram explains:
 
 ---
 
-## 🖥️ System Screens
-
 ### 🔑 Login Screen
 
 ![Login](screenshots_project/login.png)
 
 This screen allows users to log in using:
 
-* Email / ID
-* Password
+* Email / ID  
+* Password  
 
-Includes **Forgot Password (OTP system)**.
+📧 Email input field with validation:
+
+![Email Field](screenshots_project/reset_password_otp.png)
 
 ---
 
